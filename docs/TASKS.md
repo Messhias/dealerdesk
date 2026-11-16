@@ -59,7 +59,7 @@ priority story, and traceability before any product or infra code lands.
 | P0-3 | [x] | Create `docs/JOURNAL.md` scaffold | 100% todo↔SHA traceability for NOTES | Entry table; fill as commits land |
 | P0-4 | [x] | Point `docs/SDLC.md` at TASKS / JOURNAL / commit-per-todo | Discoverable from the delivery loop | Short harden-delivery bullets |
 | P0-5 | [x] | Align `BRIEF.md` with artifact gaps | Match official challenge (no upstream PR; what they look at) | Add submission/review wording without inventing product behaviour |
-| P0-6 | [ ] | Expand this board with what / why / how (this change) | Checklist alone is not enough to execute later without re-debating | Rewrite `docs/TASKS.md` as the full task specification; docs only |
+| P0-6 | [x] | Expand this board with what / why / how (this change) | Checklist alone is not enough to execute later without re-debating | Rewrite `docs/TASKS.md` as the full task specification; docs only |
 
 ---
 
@@ -76,7 +76,7 @@ fleet, GHA release.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P1-1 | [ ] | Add `Dockerfile` (build-essential, cmake/ctest) | Controllable Linux userland for legacy build | Debian-based image; `WORKDIR` = repo; no product change |
+| P1-1 | [x] | Add `Dockerfile` (build-essential, cmake/ctest) | Controllable Linux userland for legacy build | Debian-based image; `WORKDIR` = repo; no product change |
 | P1-2 | [ ] | Add root `CMakeLists.txt` for `dealerdesk` + `BUILD_TESTING` hook | Replace ad-hoc `gcc *.c` as the supported path in Docker | `include(CTest)`; `add_subdirectory(tests)` when testing on; link `-lm` |
 | P1-3 | [ ] | Add `docker-compose.yml` and/or `docs/DOCKER.md` | Repeatable “shell in, build, test, run” | `docker compose run --rm … bash`; document cmake/ctest/dealerdesk commands |
 | P1-4 | [ ] | Smoke: configure, build, trivial CTest green **in container** | Prove the pipeline before real scenarios | Placeholder `test_smoke` (or equivalent) returning 0; journal the proof |

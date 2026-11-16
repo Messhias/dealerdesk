@@ -23,3 +23,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-16 | P0 | P0-4 | 23d808d | Pointed docs/SDLC.md at TASKS, JOURNAL, commit-per-todo, trusted gate |
 | 2026-11-16 | P0 | P0-5 | e6d470f | Aligned BRIEF.md with artifact gaps (no upstream PR; what they look at) |
 | 2026-11-16 | P0 | P0-6 | 3b2c7d8 | Expanded TASKS.md with what/why/how per phase; docs only; reset P1 checkboxes
+| 2026-11-16 | P1 | P1-1 | 660a70b | Added Dockerfile (debian bookworm-slim, build-essential, cmake)
