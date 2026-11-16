@@ -26,3 +26,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-16 | P1 | P1-1 | f650996 | Added Dockerfile (debian bookworm-slim, build-essential, cmake)
 | 2026-11-16 | P1 | P1-2 | 994203e | Root CMakeLists + tests hook + build/ gitignore
 | 2026-11-16 | P1 | P1-3 | 86e659d | docker-compose.yml + docs/DOCKER.md shell/build/ctest/run
+| 2026-11-16 | P1 | P1-4 | 3346384 | test_smoke green in container (1/1 Passed)
