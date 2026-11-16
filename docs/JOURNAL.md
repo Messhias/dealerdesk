@@ -31,3 +31,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-16 | P1 | P1-host | 465b12e | Makefile + README/DOCKER host&docker paths; build vs build-docker
 | 2026-11-16 | P2 | P2-0 | 461b14a | Plain-language Pricing in SYSTEM.md with three sample invoice walkthroughs
 | 2026-11-16 | P2 | P2-1 | 129ccac | features/pricing.feature with sample invoice goldens and clamp/rounding cases
+| 2026-11-16 | P2 | P2-2 | ca6e23f | CTest test_pricing: rnd2 + 8 pricing.feature scenarios 1:1; green in Docker |
