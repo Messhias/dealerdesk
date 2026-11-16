@@ -30,8 +30,8 @@ See also: `BRIEF.md`, `TICKET-142.md`, `docs/SDLC.md`, `docs/JOURNAL.md`,
 Branch: `feature/docs-delivery-tasks`
 
 - [x] P0-1 Encode challenge ground rules in `AGENTS.md` and `.cursor/rules`
-- [ ] P0-2 Write this task board (`docs/TASKS.md`)
-- [ ] P0-3 Create `docs/JOURNAL.md` scaffold and log Phase 0 commits
+- [x] P0-2 Write this task board (`docs/TASKS.md`)
+- [x] P0-3 Create `docs/JOURNAL.md` scaffold and log Phase 0 commits
 - [ ] P0-4 Point `docs/SDLC.md` at TASKS, JOURNAL, and commit-per-todo
 - [ ] P0-5 Align `BRIEF.md` with artifact gaps (no upstream PR; what they look at)
 
