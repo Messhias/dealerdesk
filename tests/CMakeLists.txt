@@ -1,2 +1,2 @@
-# Test targets are added as Phase 2 scenarios land.
-# P1-4 registers a smoke test here.
+add_executable(test_smoke test_smoke.c)
+add_test(NAME test_smoke COMMAND test_smoke)
