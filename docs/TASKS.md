@@ -33,7 +33,7 @@ Branch: `feature/docs-delivery-tasks`
 - [x] P0-2 Write this task board (`docs/TASKS.md`)
 - [x] P0-3 Create `docs/JOURNAL.md` scaffold and log Phase 0 commits
 - [x] P0-4 Point `docs/SDLC.md` at TASKS, JOURNAL, and commit-per-todo
-- [ ] P0-5 Align `BRIEF.md` with artifact gaps (no upstream PR; what they look at)
+- [x] P0-5 Align `BRIEF.md` with artifact gaps (no upstream PR; what they look at)
 
 ## Phase 1 — Docker + CMake/CTest
 
