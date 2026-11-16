@@ -67,24 +67,126 @@ List, add, find, change price, reserve/release, list/view invoices. See
 
 ## Pricing (`calc.c`)
 
-Order of calculation in `calc_quote`:
+### Order of calculation (`calc_quote`)
 
 1. `list` = vehicle list price
-2. Trade discount: if customer type is `T`, `10%` of list (rounded to 2 dp)
-3. Salesman discount: `disc_pct` clamped to `[0, 15]`, applied to
+2. Trade discount: if customer type is `T`, `10%` of list (rounded to 2
+   decimals)
+3. Salesman discount: percent forced into `[0, 15]`, then applied to
    `(list - trade_disc)`
 4. `net` = list − trade_disc − salesman_disc
 5. `delivery` = 150.00
-6. `vat` = 20% of `(net + delivery)` (rounded to 2 dp)
+6. `vat` = 20% of `(net + delivery)` (rounded to 2 decimals)
 7. `reg_fee` = 55.00
 8. `total` = net + delivery + vat + reg_fee − tradein
 
-Notes:
+### How a price is built (plain words)
 
-- Manager PIN for high discounts is not implemented; the code only caps at 15%.
-- Plate upper-case / space normalisation is mentioned in comments and help text
-  but is not applied when adding a vehicle.
-- Sample invoices in `data/invoices.dat` match this formula.
+Start with the car's list price.
+
+If the customer is Trade (type `T`), take 10% off that list price.
+Retail customers (type `R`) skip this step.
+
+Then the salesman may give extra % off. That % can only be from 0 to 15.
+If someone types -3, the program uses 0. If someone types 40, the program
+uses 15. This second discount is calculated on what is left after the trade
+discount (not on the full list again).
+
+What is left is the net price.
+
+Add delivery: always 150.00.
+Add VAT: 20% of (net + delivery), rounded to two decimals.
+Add registration fee: always 55.00.
+Subtract any trade-in amount.
+
+That sum is the total.
+
+Rounding: when the code rounds money (`rnd2`), it keeps two digits after the
+decimal (cents). Halfway rounds up. Example: 1.235 becomes 1.24.
+
+There is no manager PIN in the code. The salesman % is only capped at 15.
+
+### Example: invoice 50230 (retail customer)
+
+What we know:
+
+- List price: 9295.00
+- Customer type: Retail (no trade discount)
+- Salesman discount: 5%
+- Trade-in: 1500.00
+
+Do the sums:
+
+1. Trade discount = 0.00
+2. Salesman discount = 5% of 9295.00 = 464.75
+3. Net = 9295.00 - 0.00 - 464.75 = 8830.25
+4. Delivery = 150.00
+5. VAT = 20% of (8830.25 + 150.00) = 20% of 8980.25 = 1796.05
+6. Registration = 55.00
+7. Total = 8830.25 + 150.00 + 1796.05 + 55.00 - 1500.00 = 9331.30
+
+Customer pays: 9331.30
+
+### Example: invoice 50231 (trade customer)
+
+What we know:
+
+- List price: 13495.00
+- Customer type: Trade (10% off list)
+- Salesman discount: 0%
+- Trade-in: 0.00
+
+Do the sums:
+
+1. Trade discount = 10% of 13495.00 = 1349.50
+2. Salesman discount = 0.00
+3. Net = 13495.00 - 1349.50 - 0.00 = 12145.50
+4. Delivery = 150.00
+5. VAT = 20% of (12145.50 + 150.00) = 20% of 12295.50 = 2459.10
+6. Registration = 55.00
+7. Total = 12145.50 + 150.00 + 2459.10 + 55.00 - 0.00 = 14809.60
+
+Customer pays: 14809.60
+
+### Example: invoice 50232 (retail customer)
+
+What we know:
+
+- List price: 10495.00
+- Customer type: Retail (no trade discount)
+- Salesman discount: 8%
+- Trade-in: 0.00
+
+Do the sums:
+
+1. Trade discount = 0.00
+2. Salesman discount = 8% of 10495.00 = 839.60
+3. Net = 10495.00 - 0.00 - 839.60 = 9655.40
+4. Delivery = 150.00
+5. VAT = 20% of (9655.40 + 150.00) = 20% of 9805.40 = 1961.08
+6. Registration = 55.00
+7. Total = 9655.40 + 150.00 + 1961.08 + 55.00 - 0.00 = 11821.48
+
+Customer pays: 11821.48
+
+These three examples match the sample rows in `data/invoices.dat`.
+
+### Screen vs saved invoice
+
+On screen, a quote shows the trade discount and the salesman discount on
+separate lines.
+
+In `data/invoices.dat` those two discounts are saved as one number (`disc` =
+trade discount + salesman discount). Delivery and registration are saved as
+one fees number: 150.00 + 55.00 = 205.00.
+
+### Notes
+
+- Help text in the menu and the comment block at the top of `calc.c` can be
+  wrong about trade %, VAT base, and manager PIN. Trust this section and the
+  code in `calc_quote`.
+- Plate upper-case / space normalisation is mentioned in comments and help
+  text but is not applied when adding a vehicle.
 
 ## Persistence (`dbfile.c`)
 

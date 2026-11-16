@@ -95,14 +95,16 @@ Before changing pricing for fleet, **current** behaviour (retail / trade only)
 must be locked with acceptance scenarios and green CTest. Staff must not
 notice non-fleet changes later.
 
-**Order inside the phase (efficiency, not scope cut):** pricing → persistence
-→ quote/sell → stock → customers → full suite in Docker.
+**Order inside the phase (efficiency, not scope cut):** pricing docs →
+pricing feature → persistence → quote/sell → stock → customers → full suite
+in Docker.
 
 **Truth:** `docs/SYSTEM.md` + sources + `data/*.dat`. Pricing = `calc_quote` in
 `calc.c` (ignore wrong comments in headers).
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
+| P2-0 | [x] | Plain-language pricing in `docs/SYSTEM.md` | Money rules must be readable before BDD/TDD | Expand Pricing with bakery-level steps, `rnd2` in words, salesman 0–15, three worked sample invoices, screen vs saved invoice; docs only |
 | P2-1 | [ ] | `features/pricing.feature` | Money is the highest-risk area | Gherkin for retail/trade 10%, salesman clamp 0–15, trade-in, `rnd2`, goldens aligned with sample invoices |
 | P2-2 | [ ] | CTest C tests for pricing; green | Executable proof of P2-1 | Unit-test `rnd2` / `calc_quote`; map scenario titles 1:1 |
 | P2-3 | [ ] | `features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; temp `data/` seam if needed |
