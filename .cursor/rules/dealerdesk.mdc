@@ -1,0 +1,22 @@
+---
+description: DealerDesk project rules for agents
+alwaysApply: true
+---
+
+# DealerDesk
+
+- Behavioural truth: `docs/SYSTEM.md` and the C sources. Prefer code and
+  `data/*.dat` over `README.md` when they conflict.
+- Pricing truth: `calc.c` (`calc_quote`).
+- Do not invent code, features, or behaviour the ticket did not ask for.
+- Docs, comments, commits, and rules: English.
+- Global project rule: never add git commit trailers (`Co-authored-by`,
+  `Signed-off-by`, `Generated-by`, `Assisted-by`, `Made-with`, or equivalents).
+  Not optional. Authorship is the human owner only.
+- Do not commit unless the user asks.
+- SDLC: `docs/SDLC.md`. BDD then TDD are mandatory on every behaviour change.
+- Canonical agent instructions: `AGENTS.md` (shared with Claude, Copilot,
+  DeepSeek, and other agents via their entry files).
+- Agents draft scenarios/tests/code; humans decide and always run manual checks.
+- Build from repo root: `gcc -o dealerdesk *.c -lm`
+- Preserve existing quote/invoice totals for non-ticket paths (to the penny).
