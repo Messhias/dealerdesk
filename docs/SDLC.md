@@ -41,6 +41,13 @@ flowchart LR
   point there (`CLAUDE.md`, `.github/copilot-instructions.md`,
   `.cursor/rules`, and any other agent that reads repo instruction files such
   as Copilot, Claude, Cursor, DeepSeek, Codex, Gemini, and similar).
+- Chosen delivery sequence and checkable todos: `docs/TASKS.md` (our
+  priorities for the take-home, not a brief-imposed checklist).
+- Running work log with todo↔commit traceability: `docs/JOURNAL.md`.
+- **Commit-per-todo:** each completed `docs/TASKS.md` item gets exactly one
+  dedicated commit; append a JOURNAL row (date, phase, task id, SHA, note).
+- Trusted verification path: Docker + CTest/TDD (see `AGENTS.md`). Multi-OS
+  release artifacts are CI/CD demo only unless stated otherwise there.
 
 ## 4. BDD (Behaviour-Driven Development)
 
