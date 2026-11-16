@@ -44,22 +44,62 @@ Hard constraints for this repository. Not optional, not tool-specific.
 - **No git commit trailers.** Never add `Co-authored-by`, `Signed-off-by`,
   `Generated-by`, `Assisted-by`, `Made-with`, or any equivalent metadata to
   commits, PRs, or files. Authorship stays with the human owner only.
-- Do not commit unless the user asks.
 - Do not force-push or rewrite shared history unless explicitly requested.
+- Do not push or open a PR unless the user asks.
+- **Commit-per-todo (delivery workstream):** when working items listed in
+  `docs/TASKS.md`, each completed todo gets exactly one dedicated commit.
+  Append `docs/JOURNAL.md` with date, phase, task id, commit SHA, and a short
+  note. No bundling unrelated todos. Outside that workstream, do not commit
+  unless the user asks.
+
+## Challenge ground rules (take-home)
+
+How this project is worked for the Nextlane DealerDesk challenge. Priorities
+are part of the answer; see `docs/TASKS.md` for the chosen sequence.
+
+- AI tools are expected; steering them is part of the work (`NOTES.md` later).
+- Any test framework, build tool, or CI is fine. GitHub Actions is convenient
+  for reviewers, not required.
+- Apart from an intentional new feature, dealership staff must not notice
+  changes. Keep non-ticket quote/invoice totals correct to the penny.
+- Suggested effort is about 6–8 hours within roughly one week. Finishing
+  everything is not required by the brief; this repo’s chosen bar is still
+  full baseline BDD/TDD before fleet (see `docs/TASKS.md`).
+- Commit as you go; history is reviewed.
+- If the ticket or code is unclear: make a reasonable call and write it down
+  (`docs/JOURNAL.md` and later `NOTES.md`).
+
+## Quality gate and releases
+
+- **Trusted quality path:** Docker environment + acceptance scenarios
+  (Gherkin behaviour/acceptance contract) + CTest/TDD, including the Docker
+  pre-run gate when present.
+- **Multi-OS GitHub Release binaries** (Windows, macOS, Linux) are a
+  **demonstration of a CI/CD delivery cycle** only. There is **no** sanity-test
+  suite around those host artifacts. Out-of-Docker builds, downloads, and any
+  host-OS smoke checks are at the **user’s discretion** and do not replace the
+  Docker + CTest gate. Never describe those binaries as production-certified.
 
 ## Working rules
 
 - Follow `docs/SDLC.md`. **BDD and TDD are mandatory** on every behaviour
   change: write scenarios first, then red → green → refactor. Do not ship
   production behaviour without that loop.
+- Acceptance scenarios live under `features/` as a behaviour/acceptance
+  contract (PO language). CTest runs the verifying C tests. Do not call
+  feature files an “implementation spec”. A Gherkin runtime runner is out of
+  scope until explicitly added.
 - Dealership staff rely on current behaviour. Outside an intentional ticket,
   keep quotes/invoices for existing customer types correct to the penny.
-- Run from repository root (`data/` is relative).
-- Working build today: `gcc -o dealerdesk *.c -lm`
+- Run from repository root (`data/` is relative). Preferred controllable path:
+  Docker + CMake/CTest (see `docs/TASKS.md`). Legacy one-liner still works:
+  `gcc -o dealerdesk *.c -lm`
 - After mutating sample data during manual checks, restore with
   `git checkout -- data` when appropriate.
 - Manual checks always accompany automated tests; the agent does not replace
   human verification.
+- Task board: `docs/TASKS.md`. Running log: `docs/JOURNAL.md`. Do not open a
+  pull request against the upstream original challenge repository.
 
 ## Module map
 

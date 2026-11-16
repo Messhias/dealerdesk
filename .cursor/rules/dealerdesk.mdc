@@ -13,10 +13,22 @@ alwaysApply: true
 - Global project rule: never add git commit trailers (`Co-authored-by`,
   `Signed-off-by`, `Generated-by`, `Assisted-by`, `Made-with`, or equivalents).
   Not optional. Authorship is the human owner only.
-- Do not commit unless the user asks.
+- No push/PR unless the user asks. No force-push unless explicitly requested.
+- Delivery workstream (`docs/TASKS.md`): one commit per completed todo; append
+  `docs/JOURNAL.md` (date, phase, task id, SHA, note). Outside that workstream,
+  do not commit unless the user asks.
+- Challenge ground rules live in `AGENTS.md` (AI expected, stack free, staff
+  must not notice non-ticket changes, commit as you go, ambiguity → write down).
+- Trusted quality: Docker + CTest/TDD (+ Docker pre-run gate). Multi-OS GitHub
+  Release binaries are CI/CD demo only: no sanity suite on those artifacts;
+  out-of-Docker use is user discretion.
+- Gherkin under `features/` = behaviour/acceptance contract, not implementation
+  spec. CTest verifies. No Gherkin runner unless explicitly added.
 - SDLC: `docs/SDLC.md`. BDD then TDD are mandatory on every behaviour change.
 - Canonical agent instructions: `AGENTS.md` (shared with Claude, Copilot,
   DeepSeek, and other agents via their entry files).
 - Agents draft scenarios/tests/code; humans decide and always run manual checks.
-- Build from repo root: `gcc -o dealerdesk *.c -lm`
+- Prefer Docker + CMake/CTest when present; legacy: `gcc -o dealerdesk *.c -lm`
+  from repo root.
 - Preserve existing quote/invoice totals for non-ticket paths (to the penny).
+- Do not open a PR against the upstream original challenge repository.

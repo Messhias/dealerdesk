@@ -49,11 +49,20 @@ A Git repository (a link, or a zip that includes the `.git` folder) containing:
   - the assumptions you made
   - what you would do next with more time
 
+Please **do not open a pull request against the original upstream challenge
+repository**. Send your own repository link (or a zip that includes `.git`).
+
 ## The technical interview
 
 We'll spend about 45 minutes going through your submission together. Be ready
 to run things live, walk us through your commits, and talk about the calls you
 made.
+
+### What we look at
+
+How you approach unfamiliar code, the judgement behind your priorities, how
+you work with and steer AI agents, and how clearly you explain your choices.
+Finishing everything matters less than all of that.
 
 ## Getting started
 
