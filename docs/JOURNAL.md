@@ -23,3 +23,9 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-16 | P0 | P0-4 | 23d808d | Pointed docs/SDLC.md at TASKS, JOURNAL, commit-per-todo, trusted gate |
 | 2026-11-16 | P0 | P0-5 | e6d470f | Aligned BRIEF.md with artifact gaps (no upstream PR; what they look at) |
 | 2026-11-16 | P0 | P0-6 | 3b2c7d8 | Expanded TASKS.md with what/why/how per phase; docs only; reset P1 checkboxes
+| 2026-11-16 | P1 | P1-1 | f650996 | Added Dockerfile (debian bookworm-slim, build-essential, cmake)
+| 2026-11-16 | P1 | P1-2 | 994203e | Root CMakeLists + tests hook + build/ gitignore
+| 2026-11-16 | P1 | P1-3 | 86e659d | docker-compose.yml + docs/DOCKER.md shell/build/ctest/run
+| 2026-11-16 | P1 | P1-4 | 3346384 | test_smoke green in container (1/1 Passed)
+| 2026-11-16 | P3 | P3-5 | 1ac5cd8 | Board: RELEASE.txt + Release notes on each CD release (2.3 → v2.4)
+| 2026-11-16 | P1 | P1-host | 465b12e | Makefile + README/DOCKER host&docker paths; build vs build-docker

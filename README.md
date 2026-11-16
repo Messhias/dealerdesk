@@ -77,3 +77,61 @@ See RELEASE.txt
 
 
 Problems: ask Phil (ext. 214).
+
+
+------------------------------------------------------------------------------
+MODERN BUILD / TEST (delivery path — keep this section updated)
+------------------------------------------------------------------------------
+
+Two supported ways from the repository root. Prefer Docker when you want the
+pinned toolchain (trusted quality path). Host CMake is fine for day-to-day
+work if you have cmake installed.
+
+Prerequisites
+-------------
+
+* Always run commands from the repository root (`data/` is relative).
+* Host path: a C compiler plus CMake on PATH.
+  - macOS (Homebrew): `brew install cmake`
+  - Debian/Ubuntu: `sudo apt-get install -y build-essential cmake`
+* Docker path: Docker Desktop (or Engine) + Compose v2. No host cmake needed.
+
+Option A — host (Makefile wrappers)
+-----------------------------------
+
+    make help
+    make          # cmake -S . -B build && cmake --build build
+    make test     # build + ctest --output-on-failure
+    make run      # ./build/dealerdesk
+    make clean    # removes build/ and build-docker/
+
+Equivalent raw cmake:
+
+    cmake -S . -B build
+    cmake --build build
+    ctest --test-dir build --output-on-failure
+    ./build/dealerdesk
+
+Option B — Docker (pinned gcc + cmake)
+--------------------------------------
+
+Host and Docker use different CMake build dirs (`build/` vs `build-docker/`)
+so caches with absolute paths do not clash.
+
+    make docker-shell   # interactive shell in the image
+    make docker-test    # configure + build + ctest in build-docker/
+
+Or:
+
+    docker compose run --rm dealerdesk bash
+
+Inside the container, same cmake/ctest/run commands as host. Details:
+`docs/DOCKER.md`.
+
+Legacy quick build (still valid)
+--------------------------------
+
+    gcc -o dealerdesk *.c -lm
+    ./dealerdesk
+
+After mutating sample data: `git checkout -- data`.

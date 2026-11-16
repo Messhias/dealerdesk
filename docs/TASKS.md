@@ -59,7 +59,7 @@ priority story, and traceability before any product or infra code lands.
 | P0-3 | [x] | Create `docs/JOURNAL.md` scaffold | 100% todo↔SHA traceability for NOTES | Entry table; fill as commits land |
 | P0-4 | [x] | Point `docs/SDLC.md` at TASKS / JOURNAL / commit-per-todo | Discoverable from the delivery loop | Short harden-delivery bullets |
 | P0-5 | [x] | Align `BRIEF.md` with artifact gaps | Match official challenge (no upstream PR; what they look at) | Add submission/review wording without inventing product behaviour |
-| P0-6 | [ ] | Expand this board with what / why / how (this change) | Checklist alone is not enough to execute later without re-debating | Rewrite `docs/TASKS.md` as the full task specification; docs only |
+| P0-6 | [x] | Expand this board with what / why / how (this change) | Checklist alone is not enough to execute later without re-debating | Rewrite `docs/TASKS.md` as the full task specification; docs only |
 
 ---
 
@@ -76,10 +76,10 @@ fleet, GHA release.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P1-1 | [ ] | Add `Dockerfile` (build-essential, cmake/ctest) | Controllable Linux userland for legacy build | Debian-based image; `WORKDIR` = repo; no product change |
-| P1-2 | [ ] | Add root `CMakeLists.txt` for `dealerdesk` + `BUILD_TESTING` hook | Replace ad-hoc `gcc *.c` as the supported path in Docker | `include(CTest)`; `add_subdirectory(tests)` when testing on; link `-lm` |
-| P1-3 | [ ] | Add `docker-compose.yml` and/or `docs/DOCKER.md` | Repeatable “shell in, build, test, run” | `docker compose run --rm … bash`; document cmake/ctest/dealerdesk commands |
-| P1-4 | [ ] | Smoke: configure, build, trivial CTest green **in container** | Prove the pipeline before real scenarios | Placeholder `test_smoke` (or equivalent) returning 0; journal the proof |
+| P1-1 | [x] | Add `Dockerfile` (build-essential, cmake/ctest) | Controllable Linux userland for legacy build | Debian-based image; `WORKDIR` = repo; no product change |
+| P1-2 | [x] | Add root `CMakeLists.txt` for `dealerdesk` + `BUILD_TESTING` hook | Replace ad-hoc `gcc *.c` as the supported path in Docker | `include(CTest)`; `add_subdirectory(tests)` when testing on; link `-lm` |
+| P1-3 | [x] | Add `docker-compose.yml` and/or `docs/DOCKER.md` | Repeatable “shell in, build, test, run” | `docker compose run --rm … bash`; document cmake/ctest/dealerdesk commands |
+| P1-4 | [x] | Smoke: configure, build, trivial CTest green **in container** | Prove the pipeline before real scenarios | Placeholder `test_smoke` (or equivalent) returning 0; journal the proof |
 
 **Done when:** Anyone can enter Docker, build, run CTest smoke, run
 `dealerdesk` against `data/` without host-toolchain lottery.
@@ -130,9 +130,11 @@ a **demo** of tag → multi-OS artifacts (not a second quality gate).
 | P3-2 | [ ] | Local script for the same Docker-centric path | Same habit outside compose one-liners | e.g. `scripts/run-with-tests.sh` documented in `docs/DOCKER.md` |
 | P3-3 | [ ] | GitHub Actions CI: build + full CTest on PR and default-branch push | Reviewers see green TDD; merge not “happy” otherwise | Prefer container job aligned with Docker trust path |
 | P3-4 | [ ] | GHA CD: merge to default branch → version tag + Win/macOS/Linux executables | Show full delivery loop | Release body **must** state: demo only; **no** sanity suite on those binaries; out-of-Docker use is user discretion; Docker+CTest remains trusted |
+| P3-5 | [ ] | Each complete CD release updates `RELEASE.txt` + Release notes | Reviewers see what shipped without digging git alone | Baseline **2.3**; first automated tag **`v2.4`** then `v2.5`…; workflow generates changelog since previous tag, rewrites `Last release:` + modern history section, puts the same notes in the GitHub Release body (with P3-4 disclaimer) |
 
 **Done when:** Gate blocks failed tests in Docker; CI runs TDD; release
-workflow exists with the disclaimer everywhere it ships.
+workflow exists with the disclaimer everywhere it ships; `RELEASE.txt`
+and the GitHub Release body record each automated release from 2.4 onward.
 
 ---
 
