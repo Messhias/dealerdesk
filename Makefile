@@ -35,7 +35,7 @@ docker-test:
 
 # Default image entrypoint: build if needed → ctest → exec dealerdesk (fail closed).
 docker-run:
-	docker compose run --rm dealerdesk
+	./scripts/run-with-tests.sh
 
 help:
 	@echo "Host (needs cmake on PATH):"
@@ -48,5 +48,6 @@ help:
 	@echo "  make docker-shell   interactive bash (bypasses pre-run gate)"
 	@echo "  make docker-test    cmake + ctest only (bypasses pre-run gate)"
 	@echo "  make docker-run     pre-run gate then dealerdesk"
+	@echo "  ./scripts/run-with-tests.sh   same as make docker-run"
 	@echo ""
 	@echo "Legacy one-liner still works: gcc -o dealerdesk *.c -lm"
