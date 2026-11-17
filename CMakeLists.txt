@@ -11,7 +11,10 @@ add_executable(dealerdesk
     stock.c
     customer.c
 )
-target_link_libraries(dealerdesk PRIVATE m)
+# libm is required on Unix; MSVC provides math in the CRT (needed for Win CD builds).
+if(UNIX)
+    target_link_libraries(dealerdesk PRIVATE m)
+endif()
 
 include(CTest)
 if(BUILD_TESTING)
