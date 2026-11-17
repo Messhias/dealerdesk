@@ -14,6 +14,7 @@
 #include "screen.h"
 #include "dbfile.h"
 #include "calc.h"
+#include "sale.h"
 
 VEHICLE  veh[MAX_VEH];
 int      nveh = 0;
@@ -311,7 +312,7 @@ static int build_quote(QUOTE *q, VEHICLE **pv, CUSTOMER **pc)
         printf("\n  Vehicle not found.\n");
         return 0;
     }
-    if (v->status == ST_SOLD) {
+    if (!vehicle_can_quote(v)) {
         printf("\n  Vehicle is already sold.\n");
         return 0;
     }
@@ -389,23 +390,18 @@ static void sell_vehicle(void)
         return;
     }
 
-    i = &inv[ninv];
-    memset(i, 0, sizeof *i);
-    i->no = next_inv_no++;
-    now = time(NULL);
-    strftime(i->date, sizeof i->date, "%Y-%m-%d", localtime(&now));
-    i->veh_id = v->id;
-    i->cust_id = c->id;
-    i->list = q.list;
-    i->disc = q.trade_disc + q.disc;
-    i->net = q.net;
-    i->vat = q.vat;
-    i->fees = q.delivery + q.reg_fee;
-    i->tradein = q.tradein;
-    i->total = q.total;
-    ninv++;
+    {
+        char datebuf[11];
 
-    v->status = ST_SOLD;
+        now = time(NULL);
+        strftime(datebuf, sizeof datebuf, "%Y-%m-%d", localtime(&now));
+        if (complete_sale(v, c, &q, datebuf) != 0) {
+            printf("\n  Could not complete sale.\n");
+            pause_enter();
+            return;
+        }
+        i = &inv[ninv - 1];
+    }
     save_invoices();
     save_stock();
     save_ids();

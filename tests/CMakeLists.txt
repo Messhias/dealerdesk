@@ -84,3 +84,38 @@ add_test(
     COMMAND test_persistence sample_repo_data
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+
+add_executable(test_quote_sell
+    test_quote_sell.c
+    ${CMAKE_SOURCE_DIR}/sale.c
+    ${CMAKE_SOURCE_DIR}/calc.c
+    ${CMAKE_SOURCE_DIR}/dbfile.c
+)
+target_include_directories(test_quote_sell PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(test_quote_sell PRIVATE m)
+
+# Scenario titles map 1:1 to features/quote_sell.feature
+add_test(
+    NAME "Sold vehicle cannot be quoted"
+    COMMAND test_quote_sell sold_cannot_quote
+)
+add_test(
+    NAME "Available vehicle can be quoted"
+    COMMAND test_quote_sell available_can_quote
+)
+add_test(
+    NAME "Invoice packs trade and salesman discounts into disc"
+    COMMAND test_quote_sell packs_disc
+)
+add_test(
+    NAME "Invoice packs delivery and registration into fees 205.00"
+    COMMAND test_quote_sell packs_fees
+)
+add_test(
+    NAME "Confirming a sale marks vehicle sold and appends invoice"
+    COMMAND test_quote_sell confirm_sale
+)
+add_test(
+    NAME "Cancelling a sale leaves stock and invoices unchanged"
+    COMMAND test_quote_sell cancel_sale
+)
