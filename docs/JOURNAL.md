@@ -40,4 +40,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-17 | P3 | P3-1 | 8e1dafa | Docker entrypoint pre-run gate + .dockerignore; make docker-run; docker-test 37/37; gated run reaches Main Menu |
 | 2026-11-17 | P3 | P3-2 | f010ad4 | scripts/run-with-tests.sh host wrapper; make docker-run delegates; DOCKER.md; 37/37 + Main Menu |
 | 2026-11-17 | P3 | P3-3 | 41e4c09 | GHA ci.yml: debian:bookworm-slim (same as Dockerfile) + CMake/CTest; no compose in CI |
-| 2026-11-17 | P3 | P3-4 | PENDING | cd-release.yml: tag v2.4+ + Win/macOS/Linux Release; workflow_dispatch dry_run; UNIX-only libm |
+| 2026-11-17 | P3 | P3-4 | e2f6b22 | cd-release.yml: tag v2.4+ + Win/macOS/Linux Release; workflow_dispatch dry_run; UNIX-only libm |
