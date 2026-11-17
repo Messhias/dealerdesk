@@ -1,0 +1,14 @@
+# Keep image build context small. Runtime bind-mounts the repo at /workspace.
+# Do not ignore scripts/ (Dockerfile COPY of the entrypoint).
+
+.git/
+build/
+build-docker/
+dealerdesk
+*.o
+.idea/
+.cursor/
+.vscode/
+.DS_Store
+**/.DS_Store
+*.md

@@ -12,13 +12,34 @@ installed locally.
 Multi-OS GitHub Release binaries (when present) are a CI/CD demo only. They are
 not a second quality gate.
 
+Image build context is filtered by `.dockerignore` (git metadata, host build
+dirs, IDE folders, and similar noise stay out of the context).
+
+## Pre-run gate
+
+The image `ENTRYPOINT` runs configure/build if needed, then
+`ctest --output-on-failure`, then `exec` of `build-docker/dealerdesk`. Any
+failure aborts before the app starts (fail closed).
+
+```bash
+make docker-run
+```
+
+Escape hatch (bypass the gate for shell or test-only work):
+
+```bash
+make docker-shell
+make docker-test
+# or: docker compose run --rm --entrypoint bash dealerdesk
+```
+
 ## Enter the container
 
 From the repository root:
 
 ```bash
 make docker-shell
-# or: docker compose run --rm dealerdesk bash
+# or: docker compose run --rm --entrypoint bash dealerdesk
 ```
 
 The repo is mounted at `/workspace`. Always run build, test, and the app from
@@ -26,13 +47,19 @@ that directory so `data/` resolves.
 
 ## Configure, build, test, run
 
-One-shot inside Docker:
+One-shot CTest inside Docker (no app):
 
 ```bash
 make docker-test
 ```
 
-Or interactively inside the container:
+Gated app start:
+
+```bash
+make docker-run
+```
+
+Or interactively inside the container (after `make docker-shell`):
 
 Inside the container use `build-docker/` (not host `build/`). CMakeCache
 stores absolute paths; sharing one dir between Mac and the container breaks

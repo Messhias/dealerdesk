@@ -7,7 +7,7 @@
 BUILD_DIR ?= build
 DOCKER_BUILD_DIR ?= build-docker
 
-.PHONY: all configure build test run clean docker-shell docker-test help
+.PHONY: all configure build test run clean docker-shell docker-test docker-run help
 
 all: build
 
@@ -26,11 +26,16 @@ run: build
 clean:
 	rm -rf $(BUILD_DIR) $(DOCKER_BUILD_DIR)
 
+# Override image ENTRYPOINT so shell/test do not go through the pre-run gate.
 docker-shell:
-	docker compose run --rm dealerdesk bash
+	docker compose run --rm --entrypoint bash dealerdesk
 
 docker-test:
-	docker compose run --rm dealerdesk bash -lc 'cmake -S . -B $(DOCKER_BUILD_DIR) && cmake --build $(DOCKER_BUILD_DIR) && ctest --test-dir $(DOCKER_BUILD_DIR) --output-on-failure'
+	docker compose run --rm --entrypoint bash dealerdesk -lc 'cmake -S . -B $(DOCKER_BUILD_DIR) && cmake --build $(DOCKER_BUILD_DIR) && ctest --test-dir $(DOCKER_BUILD_DIR) --output-on-failure'
+
+# Default image entrypoint: build if needed → ctest → exec dealerdesk (fail closed).
+docker-run:
+	docker compose run --rm dealerdesk
 
 help:
 	@echo "Host (needs cmake on PATH):"
@@ -40,7 +45,8 @@ help:
 	@echo "  make clean    remove $(BUILD_DIR)/ and $(DOCKER_BUILD_DIR)/"
 	@echo ""
 	@echo "Docker (pinned toolchain, trusted path; uses $(DOCKER_BUILD_DIR)/):"
-	@echo "  make docker-shell"
-	@echo "  make docker-test"
+	@echo "  make docker-shell   interactive bash (bypasses pre-run gate)"
+	@echo "  make docker-test    cmake + ctest only (bypasses pre-run gate)"
+	@echo "  make docker-run     pre-run gate then dealerdesk"
 	@echo ""
 	@echo "Legacy one-liner still works: gcc -o dealerdesk *.c -lm"
