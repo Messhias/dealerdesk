@@ -50,3 +50,37 @@ add_test(
     NAME "rnd2 rounds half-up to two decimal places"
     COMMAND test_pricing rnd2
 )
+
+add_executable(test_persistence
+    test_persistence.c
+    ${CMAKE_SOURCE_DIR}/dbfile.c
+)
+target_include_directories(test_persistence PRIVATE ${CMAKE_SOURCE_DIR})
+
+# Scenario titles map 1:1 to features/persistence.feature
+# Sample-data scenario needs repo-root CWD so data/ resolves.
+add_test(
+    NAME "Load skips comment and empty lines in stock file"
+    COMMAND test_persistence skip_stock_comments
+)
+add_test(
+    NAME "Load skips comment and empty lines in customers file"
+    COMMAND test_persistence skip_customer_comments
+)
+add_test(
+    NAME "Stock round-trip save then reload preserves the record"
+    COMMAND test_persistence stock_round_trip
+)
+add_test(
+    NAME "Customers and next ids round-trip save then reload"
+    COMMAND test_persistence customers_ids_round_trip
+)
+add_test(
+    NAME "Missing data files leave empty tables without crashing"
+    COMMAND test_persistence missing_files
+)
+add_test(
+    NAME "Sample repo data loads expected counts and next ids"
+    COMMAND test_persistence sample_repo_data
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)

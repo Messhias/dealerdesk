@@ -107,7 +107,7 @@ in Docker.
 | P2-0 | [x] | Plain-language pricing in `docs/SYSTEM.md` | Money rules must be readable before BDD/TDD | Expand Pricing with bakery-level steps, `rnd2` in words, salesman 0–15, three worked sample invoices, screen vs saved invoice; docs only |
 | P2-1 | [x] | `features/pricing.feature` | Money is the highest-risk area | Gherkin for retail/trade 10%, salesman clamp 0–15, trade-in, `rnd2`, goldens aligned with sample invoices |
 | P2-2 | [x] | CTest C tests for pricing; green | Executable proof of P2-1 | Unit-test `rnd2` / `calc_quote`; map scenario titles 1:1 |
-| P2-3 | [ ] | `features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; temp `data/` seam if needed |
+| P2-3 | [x] | `features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; CTest `chdir` into private temp tree with its own `data/` (no production `dbfile` change) |
 | P2-4 | [ ] | `features/quote_sell.feature` + C tests; green | Quote/sell encode business rules and invoice packing | Sold blocked; confirm/cancel sell; `disc` sum; `fees = 205`; prefer seams, stdin only if required |
 | P2-5 | [ ] | `features/stock.feature` + C tests; green | Stock mutations are daily dealer ops | Add/find/price/reserve rules from `main.c` |
 | P2-6 | [ ] | `features/customers.feature` + C tests; green | Customer type drives discounts | Add/find; R/T only (no fleet yet) |
