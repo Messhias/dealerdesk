@@ -21,9 +21,16 @@ The image `ENTRYPOINT` runs configure/build if needed, then
 `ctest --output-on-failure`, then `exec` of `build-docker/dealerdesk`. Any
 failure aborts before the app starts (fail closed).
 
+From the repository root (host), use the local wrapper instead of remembering
+compose one-liners:
+
 ```bash
+./scripts/run-with-tests.sh
 make docker-run
 ```
+
+`make docker-run` calls `scripts/run-with-tests.sh`, which runs
+`docker compose run --rm dealerdesk` and reuses the image entrypoint.
 
 Escape hatch (bypass the gate for shell or test-only work):
 

@@ -129,7 +129,7 @@ a **demo** of tag → multi-OS artifacts (not a second quality gate).
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
 | P3-1 | [x] | Docker entrypoint: CTest must pass before `dealerdesk` | Trusted pre-run gate | Script: build if needed → `ctest --output-on-failure` → `exec` binary; fail closed |
-| P3-2 | [ ] | Local script for the same Docker-centric path | Same habit outside compose one-liners | e.g. `scripts/run-with-tests.sh` documented in `docs/DOCKER.md` |
+| P3-2 | [x] | Local script for the same Docker-centric path | Same habit outside compose one-liners | e.g. `scripts/run-with-tests.sh` documented in `docs/DOCKER.md` |
 | P3-3 | [ ] | GitHub Actions CI: build + full CTest on PR and default-branch push | Reviewers see green TDD; merge not “happy” otherwise | Prefer container job aligned with Docker trust path |
 | P3-4 | [ ] | GHA CD: merge to default branch → version tag + Win/macOS/Linux executables | Show full delivery loop | Release body **must** state: demo only; **no** sanity suite on those binaries; out-of-Docker use is user discretion; Docker+CTest remains trusted |
 | P3-5 | [ ] | Each complete CD release updates `RELEASE.txt` + Release notes | Reviewers see what shipped without digging git alone | Baseline **2.3**; first automated tag **`v2.4`** then `v2.5`…; workflow generates changelog since previous tag, rewrites `Last release:` + modern history section, puts the same notes in the GitHub Release body (with P3-4 disclaimer) |
