@@ -42,4 +42,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-17 | P3 | P3-3 | 41e4c09 | GHA ci.yml: debian:bookworm-slim (same as Dockerfile) + CMake/CTest; no compose in CI |
 | 2026-11-17 | P3 | P3-4 | e2f6b22 | cd-release.yml: tag v2.4+ + Win/macOS/Linux Release; workflow_dispatch dry_run; UNIX-only libm |
 | 2026-11-17 | P3 | P3-5 | 3e63551 | RELEASE.txt + CD notes automation; drop macOS from CD matrix (Win+Linux); catch-up Last release 2.4 |
-| 2026-11-17 | P3 | ISSUE-002 | PENDING | Fix CD gh release without .git (checkout + --repo); CI PR-only; recover v2.5 Release; ISSUES.md + TASKS follow-up |
+| 2026-11-17 | P3 | ISSUE-002 | bafe0c7 | Fix CD gh release without .git (checkout + --repo); CI PR-only; recover v2.5 Release; ISSUES.md + TASKS follow-up |
