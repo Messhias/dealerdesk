@@ -4,8 +4,7 @@
 name: CI
 
 on:
-  push:
-    branches: [master]
+  # PRs only: the same suite already ran on the merge request before merge.
   pull_request:
     branches: [master]
 
