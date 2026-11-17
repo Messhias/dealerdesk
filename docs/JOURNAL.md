@@ -38,4 +38,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-17 | P2 | P2-6 | b027a8a | features/customers.feature + customer.c seams + test_customer; R/T add/find/list; 37/37 green on host |
 | 2026-11-17 | P2 | P2-7 | c2b2331 | Full baseline suite green in Docker via make docker-test; 37/37 Passed; data/ untouched |
 | 2026-11-17 | P3 | P3-1 | 8e1dafa | Docker entrypoint pre-run gate + .dockerignore; make docker-run; docker-test 37/37; gated run reaches Main Menu |
-| 2026-11-17 | P3 | P3-2 | PENDING | scripts/run-with-tests.sh host wrapper; make docker-run delegates; DOCKER.md; 37/37 + Main Menu |
+| 2026-11-17 | P3 | P3-2 | f010ad4 | scripts/run-with-tests.sh host wrapper; make docker-run delegates; DOCKER.md; 37/37 + Main Menu |
