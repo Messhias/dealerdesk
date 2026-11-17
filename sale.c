@@ -37,8 +37,6 @@ void invoice_from_quote(INVOICE *i, const QUOTE *q, int inv_no,
 int complete_sale(VEHICLE *v, const CUSTOMER *c, const QUOTE *q,
                   const char *date)
 {
-    INVOICE *i;
-
     if (!v || !c || !q || !date)
         return -1;
     if (!vehicle_can_quote(v))
@@ -46,7 +44,7 @@ int complete_sale(VEHICLE *v, const CUSTOMER *c, const QUOTE *q,
     if (ninv >= MAX_INV)
         return -1;
 
-    i = &inv[ninv];
+    INVOICE* i = &inv[ninv];
     invoice_from_quote(i, q, next_inv_no, date, v->id, c->id);
     next_inv_no++;
     ninv++;
