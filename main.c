@@ -14,6 +14,8 @@
 #include "screen.h"
 #include "dbfile.h"
 #include "calc.h"
+#include "sale.h"
+#include "stock.h"
 
 VEHICLE  veh[MAX_VEH];
 int      nveh = 0;
@@ -66,7 +68,7 @@ static void list_stock(int show_sold)
            "ID", "PLATE", "MAKE", "MODEL", "YEAR", "MILES", "PRICE", "STATUS");
     printf("  ----------------------------------------------------------------------------------\n");
     for (i = 0; i < nveh; i++) {
-        if (!show_sold && veh[i].status == ST_SOLD)
+        if (!stock_visible_in_list(&veh[i], show_sold))
             continue;
         printf("  %-5d %-10s %-12s %-22.22s %4d %8ld %10.2f  %s\n",
                veh[i].id, veh[i].plate, veh[i].make, veh[i].model,
@@ -80,7 +82,9 @@ static void list_stock(int show_sold)
 
 static void add_vehicle(void)
 {
-    VEHICLE v;
+    char plate[12];
+    char make[24];
+    char model[40];
     char b[32];
 
     header("Add Vehicle");
@@ -89,91 +93,97 @@ static void add_vehicle(void)
         pause_enter();
         return;
     }
-    memset(&v, 0, sizeof v);
-    read_line("  Plate      : ", v.plate, sizeof v.plate);
-    read_line("  Make       : ", v.make, sizeof v.make);
-    read_line("  Model      : ", v.model, sizeof v.model);
-    v.year = read_int("  Year       : ");
-    read_line("  Mileage    : ", b, sizeof b);
-    v.mileage = atol(b);
-    v.cost = read_money("  Cost price : ");
-    v.price = read_money("  List price : ");
+    read_line("  Plate      : ", plate, sizeof plate);
+    read_line("  Make       : ", make, sizeof make);
+    read_line("  Model      : ", model, sizeof model);
 
-    if (v.plate[0] == 0 || v.price <= 0) {
+    const int year = read_int("  Year       : ");
+    
+    read_line("  Mileage    : ", b, sizeof b);
+
+    const long mileage = atol(b);
+    const double cost = read_money("  Cost price : ");
+    const double price = read_money("  List price : ");
+
+    const int rc = stock_add(plate, make, model, year, mileage, cost, price);
+    
+    if (rc != 0) {
         printf("\n  Plate and list price are required.\n");
         pause_enter();
         return;
     }
-    v.id = next_veh_id++;
-    v.status = ST_STOCK;
-    veh[nveh++] = v;
     save_stock();
     save_ids();
-    printf("\n  Vehicle %d added.\n", v.id);
+    printf("\n  Vehicle %d added.\n", veh[nveh - 1].id);
+    
     pause_enter();
 }
 
 static void find_plate(void)
 {
     char b[16];
-    int i, found = 0;
 
     header("Find Vehicle");
     read_line("  Plate : ", b, sizeof b);
-    for (i = 0; i < nveh; i++) {
-        if (strcmp(veh[i].plate, b) == 0) {
-            printf("\n  ID       : %d\n", veh[i].id);
-            printf("  Vehicle  : %s %s (%d)\n", veh[i].make, veh[i].model, veh[i].year);
-            printf("  Mileage  : %ld\n", veh[i].mileage);
-            printf("  Price    : %.2f\n", veh[i].price);
-            printf("  Status   : %s\n", status_txt(veh[i].status));
-            found = 1;
-        }
-    }
-    if (!found)
+    
+    if (stock_find_first_by_plate(b) < 0) {
         printf("\n  No vehicle with plate %s\n", b);
+        pause_enter();
+        return;
+    }
+    
+    for (int i = 0; i < nveh; i++) {
+        if (strcmp(veh[i].plate, b) != 0)
+            continue;
+        printf("\n  ID       : %d\n", veh[i].id);
+        printf("  Vehicle  : %s %s (%d)\n", veh[i].make, veh[i].model, veh[i].year);
+        printf("  Mileage  : %ld\n", veh[i].mileage);
+        printf("  Price    : %.2f\n", veh[i].price);
+        printf("  Status   : %s\n", status_txt(veh[i].status));
+    }
+    
     pause_enter();
 }
 
 static void change_price(void)
 {
-    VEHICLE *v;
-    double p;
-
     header("Change Price");
-    v = find_veh(read_int("  Vehicle ID : "));
+    VEHICLE* v = find_veh(read_int("  Vehicle ID : "));
+    
     if (!v) {
         printf("\n  Vehicle not found.\n");
         pause_enter();
         return;
     }
+    
     printf("  %s %s %s, current price %.2f\n", v->plate, v->make, v->model, v->price);
-    p = read_money("  New price  : ");
-    if (p > 0) {
-        v->price = p;
+
+    const double p = read_money("  New price  : ");
+    
+    if (stock_set_price(v, p)) {
         save_stock();
         printf("\n  Price updated.\n");
     } else {
         printf("\n  Price not changed.\n");
     }
+    
     pause_enter();
 }
 
 static void reserve_vehicle(void)
 {
-    VEHICLE *v;
-
     header("Reserve / Release");
-    v = find_veh(read_int("  Vehicle ID : "));
+    VEHICLE* v = find_veh(read_int("  Vehicle ID : "));
+    
     if (!v) {
         printf("\n  Vehicle not found.\n");
-    } else if (v->status == ST_SOLD) {
+    } else if (stock_toggle_reserve(v) != 0) {
         printf("\n  Vehicle is already sold.\n");
     } else {
-        v->status = (v->status == ST_STOCK) ? ST_RESERVED : ST_STOCK;
         save_stock();
         printf("\n  Vehicle %d is now %s.\n", v->id, status_txt(v->status));
     }
+    
     pause_enter();
 }
 
@@ -311,7 +321,7 @@ static int build_quote(QUOTE *q, VEHICLE **pv, CUSTOMER **pc)
         printf("\n  Vehicle not found.\n");
         return 0;
     }
-    if (v->status == ST_SOLD) {
+    if (!vehicle_can_quote(v)) {
         printf("\n  Vehicle is already sold.\n");
         return 0;
     }
@@ -389,23 +399,18 @@ static void sell_vehicle(void)
         return;
     }
 
-    i = &inv[ninv];
-    memset(i, 0, sizeof *i);
-    i->no = next_inv_no++;
-    now = time(NULL);
-    strftime(i->date, sizeof i->date, "%Y-%m-%d", localtime(&now));
-    i->veh_id = v->id;
-    i->cust_id = c->id;
-    i->list = q.list;
-    i->disc = q.trade_disc + q.disc;
-    i->net = q.net;
-    i->vat = q.vat;
-    i->fees = q.delivery + q.reg_fee;
-    i->tradein = q.tradein;
-    i->total = q.total;
-    ninv++;
+    {
+        char datebuf[11];
 
-    v->status = ST_SOLD;
+        now = time(NULL);
+        strftime(datebuf, sizeof datebuf, "%Y-%m-%d", localtime(&now));
+        if (complete_sale(v, c, &q, datebuf) != 0) {
+            printf("\n  Could not complete sale.\n");
+            pause_enter();
+            return;
+        }
+        i = &inv[ninv - 1];
+    }
     save_invoices();
     save_stock();
     save_ids();
