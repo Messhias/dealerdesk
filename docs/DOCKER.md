@@ -12,6 +12,11 @@ installed locally.
 Multi-OS GitHub Release binaries (when present) are a CI/CD demo only. They are
 not a second quality gate.
 
+GitHub Actions CI (`.github/workflows/ci.yml`) uses `debian:bookworm-slim`,
+the same base OS as this repo’s Dockerfile, and runs CMake/CTest there on every
+pull request and every push to `master` (no docker compose in CI). Local
+trusted runs remain `make docker-test` / the pre-run gate.
+
 Image build context is filtered by `.dockerignore` (git metadata, host build
 dirs, IDE folders, and similar noise stay out of the context).
 
