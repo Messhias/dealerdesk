@@ -36,3 +36,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-17 | P2 | P2-4 | c87fd1f | features/quote_sell.feature + sale.c seams + test_quote_sell; sold blocked, disc/fees packing, confirm/cancel without stdin; 22/22 green in Docker |
 | 2026-11-17 | P2 | P2-5 | 6d15e16 | features/stock.feature + stock.c seams + test_stock; test_common harness extract; drop test_smoke; 29/29 green on host |
 | 2026-11-17 | P2 | P2-6 | b027a8a | features/customers.feature + customer.c seams + test_customer; R/T add/find/list; 37/37 green on host |
+| 2026-11-17 | P2 | P2-7 | c2b2331 | Full baseline suite green in Docker via make docker-test; 37/37 Passed; data/ untouched |
