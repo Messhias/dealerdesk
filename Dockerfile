@@ -9,6 +9,10 @@ RUN apt-get update \
         cmake \
     && rm -rf /var/lib/apt/lists/*
 
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 WORKDIR /workspace
 
-CMD ["bash"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD []
