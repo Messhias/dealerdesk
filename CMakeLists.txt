@@ -8,6 +8,7 @@ add_executable(dealerdesk
     dbfile.c
     screen.c
     sale.c
+    stock.c
 )
 target_link_libraries(dealerdesk PRIVATE m)
 

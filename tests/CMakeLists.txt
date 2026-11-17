@@ -3,14 +3,17 @@ if(POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW)
 endif()
 
-add_executable(test_smoke test_smoke.c)
-add_test(NAME test_smoke COMMAND test_smoke)
+set(TEST_COMMON test_common.c)
 
 add_executable(test_pricing
     test_pricing.c
+    ${TEST_COMMON}
     ${CMAKE_SOURCE_DIR}/calc.c
 )
-target_include_directories(test_pricing PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(test_pricing PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 target_link_libraries(test_pricing PRIVATE m)
 
 # Scenario titles map 1:1 to features/pricing.feature
@@ -53,9 +56,14 @@ add_test(
 
 add_executable(test_persistence
     test_persistence.c
+    ${TEST_COMMON}
     ${CMAKE_SOURCE_DIR}/dbfile.c
 )
-target_include_directories(test_persistence PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(test_persistence PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(test_persistence PRIVATE m)
 
 # Scenario titles map 1:1 to features/persistence.feature
 # Sample-data scenario needs repo-root CWD so data/ resolves.
@@ -87,11 +95,15 @@ add_test(
 
 add_executable(test_quote_sell
     test_quote_sell.c
+    ${TEST_COMMON}
     ${CMAKE_SOURCE_DIR}/sale.c
     ${CMAKE_SOURCE_DIR}/calc.c
     ${CMAKE_SOURCE_DIR}/dbfile.c
 )
-target_include_directories(test_quote_sell PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(test_quote_sell PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 target_link_libraries(test_quote_sell PRIVATE m)
 
 # Scenario titles map 1:1 to features/quote_sell.feature
@@ -118,4 +130,50 @@ add_test(
 add_test(
     NAME "Cancelling a sale leaves stock and invoices unchanged"
     COMMAND test_quote_sell cancel_sale
+)
+
+add_executable(test_stock
+    test_stock.c
+    ${TEST_COMMON}
+    ${CMAKE_SOURCE_DIR}/stock.c
+    ${CMAKE_SOURCE_DIR}/dbfile.c
+)
+target_include_directories(test_stock PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(test_stock PRIVATE m)
+
+# Scenario titles map 1:1 to features/stock.feature
+add_test(
+    NAME "Adding a vehicle requires plate and positive list price"
+    COMMAND test_stock add_requires_plate_price
+)
+add_test(
+    NAME "Valid add assigns next id and in-stock status"
+    COMMAND test_stock valid_add
+)
+add_test(
+    NAME "Find by plate matches exactly including case"
+    COMMAND test_stock find_exact_case
+)
+add_test(
+    NAME "Change price updates when new price is positive"
+    COMMAND test_stock change_price_positive
+)
+add_test(
+    NAME "Change price leaves price unchanged when new price is not positive"
+    COMMAND test_stock change_price_rejected
+)
+add_test(
+    NAME "Reserve toggles between in stock and reserved"
+    COMMAND test_stock reserve_toggle
+)
+add_test(
+    NAME "Sold vehicle cannot be reserved"
+    COMMAND test_stock sold_cannot_reserve
+)
+add_test(
+    NAME "List stock omits sold vehicles"
+    COMMAND test_stock list_omits_sold
 )
