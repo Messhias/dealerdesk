@@ -13,9 +13,9 @@ Multi-OS GitHub Release binaries (when present) are a CI/CD demo only. They are
 not a second quality gate.
 
 GitHub Actions CI (`.github/workflows/ci.yml`) uses `debian:bookworm-slim`,
-the same base OS as this repo’s Dockerfile, and runs CMake/CTest there on every
-pull request and every push to `master` (no docker compose in CI). Local
-trusted runs remain `make docker-test` / the pre-run gate.
+the same base OS as this repo’s Dockerfile, and runs CMake/CTest on every
+pull request to `master` (no re-run on merge push; no docker compose in CI).
+Local trusted runs remain `make docker-test` / the pre-run gate.
 
 GitHub Actions CD (`.github/workflows/cd-release.yml`) is a **delivery demo
 only**: on push to `master` it may create the next `v2.N` tag, update
