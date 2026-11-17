@@ -1,0 +1,36 @@
+# CI OS matches the local Docker base image (debian:bookworm-slim).
+# Runs CMake/CTest inside that userland without docker compose.
+# Multi-OS release binaries (when present) are a demo only, not this gate.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: Debian Bookworm CTest
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm-slim
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ca-certificates \
+            git
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure, build, and run CTest
+        run: |
+          cmake -S . -B build
+          cmake --build build
+          ctest --test-dir build --output-on-failure
