@@ -33,3 +33,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-16 | P2 | P2-1 | 129ccac | features/pricing.feature with sample invoice goldens and clamp/rounding cases
 | 2026-11-16 | P2 | P2-2 | ca6e23f | CTest test_pricing: rnd2 + 8 pricing.feature scenarios 1:1; green in Docker |
 | 2026-11-17 | P2 | P2-3 | 12785cd | features/persistence.feature + test_persistence via chdir temp data/; zero dbfile change. Lesson: first tried a db_set_data_dir production seam; wrong. Same isolation without touching production persistence code. |
+| 2026-11-17 | P2 | P2-4 | c87fd1f | features/quote_sell.feature + sale.c seams + test_quote_sell; sold blocked, disc/fees packing, confirm/cancel without stdin; 22/22 green in Docker |
