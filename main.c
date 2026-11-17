@@ -16,6 +16,7 @@
 #include "calc.h"
 #include "sale.h"
 #include "stock.h"
+#include "customer.h"
 
 VEHICLE  veh[MAX_VEH];
 int      nveh = 0;
@@ -228,19 +229,28 @@ static void print_cust_row(CUSTOMER *c)
 static void list_customers(void)
 {
     int i;
+    int n = 0;
 
     header("Customers");
     printf("  %-5s %-26s %-14s %-28s %s\n", "ID", "NAME", "PHONE", "EMAIL", "TYPE");
     printf("  -----------------------------------------------------------------------------------\n");
-    for (i = 0; i < ncust; i++)
+    for (i = 0; i < ncust; i++) {
+        if (!customer_visible_in_list(&cust[i]))
+            continue;
         print_cust_row(&cust[i]);
-    printf("\n  %d customer(s)\n", ncust);
+        n++;
+    }
+    printf("\n  %d customer(s)\n", n);
     pause_enter();
 }
 
 static void add_customer(void)
 {
-    CUSTOMER c;
+    char name[48];
+    char phone[20];
+    char email[64];
+    int trade_yes;
+    int rc;
 
     header("Add Customer");
     if (ncust >= MAX_CUST) {
@@ -248,38 +258,37 @@ static void add_customer(void)
         pause_enter();
         return;
     }
-    memset(&c, 0, sizeof c);
-    read_line("  Name   : ", c.name, sizeof c.name);
-    read_line("  Phone  : ", c.phone, sizeof c.phone);
-    read_line("  Email  : ", c.email, sizeof c.email);
-    c.type = confirm("  Trade customer (Y/N)? ") ? 'T' : 'R';
+    read_line("  Name   : ", name, sizeof name);
+    read_line("  Phone  : ", phone, sizeof phone);
+    read_line("  Email  : ", email, sizeof email);
+    trade_yes = confirm("  Trade customer (Y/N)? ");
 
-    if (c.name[0] == 0) {
+    rc = customer_add(name, phone, email, trade_yes);
+    if (rc != 0) {
         printf("\n  Name is required.\n");
         pause_enter();
         return;
     }
-    c.id = next_cust_id++;
-    cust[ncust++] = c;
     save_customers();
     save_ids();
-    printf("\n  Customer %d added.\n", c.id);
+    printf("\n  Customer %d added.\n", cust[ncust - 1].id);
     pause_enter();
 }
 
 static void find_customer(void)
 {
     char b[48];
-    int i, n = 0;
+    int i;
+    int n = 0;
 
     header("Find Customer");
     read_line("  Name contains : ", b, sizeof b);
     printf("\n");
     for (i = 0; i < ncust; i++) {
-        if (strstr(cust[i].name, b)) {
-            print_cust_row(&cust[i]);
-            n++;
-        }
+        if (!customer_name_matches(&cust[i], b))
+            continue;
+        print_cust_row(&cust[i]);
+        n++;
     }
     printf("\n  %d match(es)\n", n);
     pause_enter();

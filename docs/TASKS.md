@@ -110,7 +110,7 @@ in Docker.
 | P2-3 | [x] | `features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; CTest `chdir` into private temp tree with its own `data/` (no production `dbfile` change) |
 | P2-4 | [x] | `features/quote_sell.feature` + C tests; green | Quote/sell encode business rules and invoice packing | Sold blocked; confirm/cancel sell; `disc` sum; `fees = 205`; prefer seams, stdin only if required |
 | P2-5 | [x] | `features/stock.feature` + C tests; green | Stock mutations are daily dealer ops | Add/find/price/reserve rules from `main.c` |
-| P2-6 | [ ] | `features/customers.feature` + C tests; green | Customer type drives discounts | Add/find; R/T only (no fleet yet) |
+| P2-6 | [x] | `features/customers.feature` + C tests; green | Customer type drives discounts | Add/find; R/T only (no fleet yet) |
 | P2-7 | [ ] | Full baseline suite green inside Docker | Trusted gate input for Phase 3 | `ctest` in-container; restore `data/` after mutating checks |
 
 **Done when:** Baseline acceptance suite is green in Docker and documents
