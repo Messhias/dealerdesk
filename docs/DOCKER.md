@@ -18,14 +18,17 @@ pull request and every push to `master` (no docker compose in CI). Local
 trusted runs remain `make docker-test` / the pre-run gate.
 
 GitHub Actions CD (`.github/workflows/cd-release.yml`) is a **delivery demo
-only**: on push to `master` it may create the next `v2.N` tag and attach
-Win/macOS/Linux binaries to a GitHub Release. Those artifacts have **no**
-sanity suite; out-of-Docker use is user discretion. Docker + CTest remains
-the trusted quality path.
+only**: on push to `master` it may create the next `v2.N` tag, update
+`RELEASE.txt` (with `[skip ci]`), and attach **Windows + Linux** binaries to a
+GitHub Release (macOS omitted because hosted runner queue stalled the
+pipeline). Those artifacts have **no** sanity suite; out-of-Docker use is user
+discretion. Docker + CTest remains the trusted quality path. Release notes and
+the `RELEASE.txt` modern history share the same disclaimer + changelog text.
 
-To exercise the multi-OS build **without** merging or tagging: Actions →
-CD Release Demo → Run workflow → pick the feature branch → leave
-`dry_run` enabled. That uploads build artifacts only (no tag, no Release).
+To exercise the build **without** merging or tagging: Actions → CD Release
+Demo → Run workflow → pick the feature branch → leave `dry_run` enabled. That
+uploads Win/Linux build artifacts only (no tag, no Release, no `RELEASE.txt`
+commit).
 
 Image build context is filtered by `.dockerignore` (git metadata, host build
 dirs, IDE folders, and similar noise stay out of the context).
