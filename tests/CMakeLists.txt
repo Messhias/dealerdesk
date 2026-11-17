@@ -177,3 +177,49 @@ add_test(
     NAME "List stock omits sold vehicles"
     COMMAND test_stock list_omits_sold
 )
+
+add_executable(test_customer
+    test_customer.c
+    ${TEST_COMMON}
+    ${CMAKE_SOURCE_DIR}/customer.c
+    ${CMAKE_SOURCE_DIR}/dbfile.c
+)
+target_include_directories(test_customer PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(test_customer PRIVATE m)
+
+# Scenario titles map 1:1 to features/customers.feature
+add_test(
+    NAME "Adding a customer requires a non-empty name"
+    COMMAND test_customer add_requires_name
+)
+add_test(
+    NAME "Valid add assigns next customer id and default retail type"
+    COMMAND test_customer valid_add_retail
+)
+add_test(
+    NAME "Valid add with trade confirmed sets type T"
+    COMMAND test_customer valid_add_trade
+)
+add_test(
+    NAME "Add is rejected when customer table is full"
+    COMMAND test_customer add_full_table
+)
+add_test(
+    NAME "Find by name uses case-sensitive substring match"
+    COMMAND test_customer find_case_sensitive
+)
+add_test(
+    NAME "Find with empty substring matches all customers"
+    COMMAND test_customer find_empty_matches_all
+)
+add_test(
+    NAME "Find with no matching substring returns zero matches"
+    COMMAND test_customer find_no_match
+)
+add_test(
+    NAME "List customers includes every stored customer"
+    COMMAND test_customer list_includes_all
+)
