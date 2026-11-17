@@ -17,6 +17,16 @@ the same base OS as this repo’s Dockerfile, and runs CMake/CTest there on ever
 pull request and every push to `master` (no docker compose in CI). Local
 trusted runs remain `make docker-test` / the pre-run gate.
 
+GitHub Actions CD (`.github/workflows/cd-release.yml`) is a **delivery demo
+only**: on push to `master` it may create the next `v2.N` tag and attach
+Win/macOS/Linux binaries to a GitHub Release. Those artifacts have **no**
+sanity suite; out-of-Docker use is user discretion. Docker + CTest remains
+the trusted quality path.
+
+To exercise the multi-OS build **without** merging or tagging: Actions →
+CD Release Demo → Run workflow → pick the feature branch → leave
+`dry_run` enabled. That uploads build artifacts only (no tag, no Release).
+
 Image build context is filtered by `.dockerignore` (git metadata, host build
 dirs, IDE folders, and similar noise stay out of the context).
 

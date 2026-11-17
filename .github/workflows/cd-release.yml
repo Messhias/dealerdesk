@@ -1,0 +1,194 @@
+# CD demo: tag + multi-OS binaries. NOT a second quality gate.
+# Trusted path remains Docker + CTest (local gate / CI on Debian Bookworm).
+#
+# Test without merging to master:
+#   Actions → CD Release Demo → Run workflow → branch feature/... → dry_run=true
+# That builds Win/macOS/Linux artifacts only (no tag, no GitHub Release).
+name: CD Release Demo
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build matrix only; do not create tag or GitHub Release
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Next version tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.decide.outputs.version }}
+      checkout_ref: ${{ steps.decide.outputs.checkout_ref }}
+      should_build: ${{ steps.decide.outputs.should_build }}
+      should_release: ${{ steps.decide.outputs.should_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decide version / tag / dry-run
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          dry_run=false
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            dry_run=true
+          fi
+
+          # Next version number (always computed for naming / logs).
+          latest="$(git tag -l 'v2.*' --sort=-v:refname | head -n1 || true)"
+          if [[ -z "${latest}" ]]; then
+            version="v2.4"
+          else
+            # v2.N -> v2.(N+1) per board (v2.4, v2.5, ...)
+            minor="${latest#v2.}"
+            if [[ ! "${minor}" =~ ^[0-9]+$ ]]; then
+              echo "Unsupported latest tag '${latest}'; expected v2.N" >&2
+              exit 1
+            fi
+            version="v2.$((minor + 1))"
+          fi
+
+          if [[ "${dry_run}" == "true" ]]; then
+            echo "Dry run: will build ${version} artifacts from HEAD; no tag/release."
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
+            echo "checkout_ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # If HEAD already has a v* tag, skip (idempotent on re-runs).
+          existing="$(git tag --points-at HEAD | grep -E '^v[0-9]' | head -n1 || true)"
+          if [[ -n "${existing}" ]]; then
+            echo "HEAD already tagged as ${existing}; skipping release."
+            echo "version=${existing}" >> "$GITHUB_OUTPUT"
+            echo "checkout_ref=${existing}" >> "$GITHUB_OUTPUT"
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${version}" -m "DealerDesk ${version} (CD demo release)"
+          git push origin "refs/tags/${version}"
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "checkout_ref=${version}" >> "$GITHUB_OUTPUT"
+          echo "should_build=true" >> "$GITHUB_OUTPUT"
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.artifact }}
+    needs: tag
+    if: needs.tag.outputs.should_build == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: dealerdesk-windows.exe
+            binary: dealerdesk.exe
+          - os: macos-latest
+            artifact: dealerdesk-macos
+            binary: dealerdesk
+          - os: ubuntu-latest
+            artifact: dealerdesk-linux
+            binary: dealerdesk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.checkout_ref }}
+
+      - name: Install CMake (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake
+
+      - name: Configure and build (no CTest; demo artifact only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+          cmake --build build --config Release
+
+          # Single-config (Ninja/Make) vs multi-config (VS).
+          if [[ -f "build/Release/${{ matrix.binary }}" ]]; then
+            src="build/Release/${{ matrix.binary }}"
+          elif [[ -f "build/${{ matrix.binary }}" ]]; then
+            src="build/${{ matrix.binary }}"
+          else
+            echo "Binary not found for ${{ matrix.binary }}" >&2
+            find build -name 'dealerdesk*' -print >&2 || true
+            exit 1
+          fi
+          cp "${src}" "${{ matrix.artifact }}"
+          ls -la "${{ matrix.artifact }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: [tag, build]
+    if: needs.tag.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.tag.outputs.version }}
+        run: |
+          set -euo pipefail
+          ls -la dist
+
+          body="$(cat <<EOF
+          ## DealerDesk ${VERSION} (CI/CD delivery demo)
+
+          **This release is a demonstration of the delivery loop only.**
+
+          - There is **no** sanity-test suite around these host binaries.
+          - Out-of-Docker use is at the **user's discretion**.
+          - Trusted quality path remains **Docker + CTest** (local pre-run gate and CI on Debian Bookworm).
+          - Do **not** treat these artifacts as production-certified.
+
+          ### Assets
+          - \`dealerdesk-windows.exe\`
+          - \`dealerdesk-macos\`
+          - \`dealerdesk-linux\`
+          EOF
+          )"
+
+          # Flatten heredoc leading spaces for a readable Release body.
+          body="$(printf '%s\n' "${body}" | sed 's/^          //')"
+
+          gh release create "${VERSION}" \
+            dist/dealerdesk-windows.exe \
+            dist/dealerdesk-macos \
+            dist/dealerdesk-linux \
+            --title "DealerDesk ${VERSION}" \
+            --notes "${body}"
