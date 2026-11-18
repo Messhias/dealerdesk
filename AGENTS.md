@@ -79,6 +79,12 @@ are part of the answer; see `docs/TASKS.md` for the chosen sequence.
   suite around those host artifacts. Out-of-Docker builds, downloads, and any
   host-OS smoke checks are at the **user’s discretion** and do not replace the
   Docker + CTest gate. Never describe those binaries as production-certified.
+- **App version:** single source is `version.h` (`DEALERDESK_VERSION`), shown
+  by `screen.c` in the terminal banner. Do not hardcode a version string in
+  `screen.c` or invent a new literal elsewhere. On each CD release to `master`,
+  `scripts/update-release-txt.sh` updates `RELEASE.txt` and `version.h` to the
+  same version before the tag, so GitHub Release and the binary header match.
+  Only bump manually when an explicit release task says so.
 
 ## Working rules
 
@@ -109,6 +115,7 @@ are part of the answer; see `docs/TASKS.md` for the chosen sequence.
 | `calc.c` | Pricing |
 | `dbfile.c` | Flat-file I/O |
 | `screen.c` | Terminal helpers |
+| `version.h` | In-app version (`DEALERDESK_VERSION`) |
 | `globals.h` | Structs and limits |
 | `docs/SYSTEM.md` | Documented current behaviour |
 | `docs/SDLC.md` | SDLC with AI |

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "screen.h"
+#include "version.h"
 
 void cls(void)
 {
@@ -15,7 +16,7 @@ void header(const char *title)
 {
     cls();
     printf("==============================================================\n");
-    printf("  DEALERDESK v2.3 %44s\n", title);
+    printf("  DEALERDESK v%s %44s\n", DEALERDESK_VERSION, title);
     printf("==============================================================\n\n");
 }
 
