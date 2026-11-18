@@ -31,6 +31,28 @@ Modern release history
 
 ### Changes since v2.8
 
+- Fix TASKS.md to add missing tests (90111c6)
+- Update RELEASE.txt for v2.9 [skip ci] (995e18d)
+- Phase 5: BDD terminal suite (features/runner/steps + PNGs) (#17) (df5ac96)
+
+
+2.9 (2026-11-18)
+------------------
+## DealerDesk v2.9 (CI/CD delivery demo)
+
+**This release is a demonstration of the delivery loop only.**
+
+- There is **no** sanity-test suite around these host binaries.
+- Out-of-Docker use is at the **user's discretion**.
+- Trusted quality path remains **Docker + CTest** (local pre-run gate and CI on Debian Bookworm).
+- Do **not** treat these artifacts as production-certified.
+
+### Assets
+- `dealerdesk-windows.exe`
+- `dealerdesk-linux`
+
+### Changes since v2.8
+
 - Phase 5: BDD terminal suite (features/runner/steps + PNGs) (#17) (df5ac96)
 
 
