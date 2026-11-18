@@ -223,3 +223,46 @@ add_test(
     NAME "List customers includes every stored customer"
     COMMAND test_customer list_includes_all
 )
+
+add_executable(test_fleet
+    test_fleet.c
+    ${TEST_COMMON}
+    ${CMAKE_SOURCE_DIR}/calc.c
+    ${CMAKE_SOURCE_DIR}/customer.c
+    ${CMAKE_SOURCE_DIR}/dbfile.c
+)
+target_include_directories(test_fleet PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(test_fleet PRIVATE m)
+
+# Scenario titles map 1:1 to features/fleet.feature
+add_test(
+    NAME "Fleet quote shows 4% off list with no salesman discount"
+    COMMAND test_fleet fleet_4pct_no_salesman
+)
+add_test(
+    NAME "Fleet discount then salesman discount on what is left"
+    COMMAND test_fleet fleet_then_salesman
+)
+add_test(
+    NAME "Fleet fees stay fixed delivery 150 and registration 55"
+    COMMAND test_fleet fleet_fixed_fees
+)
+add_test(
+    NAME "Retail quote totals stay unchanged to the penny after fleet"
+    COMMAND test_fleet retail_unchanged
+)
+add_test(
+    NAME "Trade quote totals stay unchanged to the penny after fleet"
+    COMMAND test_fleet trade_unchanged
+)
+add_test(
+    NAME "Adding a new customer as fleet sets type F"
+    COMMAND test_fleet add_fleet_type_f
+)
+add_test(
+    NAME "Existing retail customer can be marked as fleet"
+    COMMAND test_fleet mark_existing_fleet
+)
