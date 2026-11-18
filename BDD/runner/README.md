@@ -1,29 +1,32 @@
 # DealerDesk — BDD terminal runner
 
-C harness under `BDD/` that drives the built `dealerdesk` binary through a
-terminal session. Gherkin lives in `BDD/features/`; step definitions in
-`BDD/step_definitions/`; this directory is the runner.
+C harness that drives the real `dealerdesk` binary for scenarios tagged
+`@terminal` inside the existing `BDD/features/*.feature` files.
 
-Scenarios tagged `@terminal` run here. Other scenarios in `BDD/features/` are
-the acceptance contract verified by unit/seam CTest under `tests/`.
+There are no parallel `*_terminal.feature` files. Tag the original Scenario
+blocks (same titles CTest already maps 1:1) when the behaviour has an honest
+menu path. Invented Scenario titles are not allowed.
 
-Runs on host or Docker. Needs a Unix-like terminal session (Linux/macOS, or
-Linux via Docker).
+Each `@terminal` scenario uses an isolated temp copy of `data/` (same idea as
+CTest), asserts stdout / persisted files, and writes per-step PNGs under
+`BDD/artifacts/<feature_stem>/`.
+
+Scenarios without `@terminal` stay the CTest behaviour contract only. The
+runner ignores them.
+
+Step definitions are split under `BDD/step_definitions/` to match feature
+areas (`stock_steps.c`, `customers_steps.c`, …) plus shared
+`steps_common.c` / `steps_registry.c`. Every `.c` there is compiled into
+`bdd_runner` via `BDD/CMakeLists.txt`.
+
+Not a CI job. Local or Docker via `make bdd` / `make docker-bdd`.
 
 ## Host
-
-Needs a local C compiler, zlib headers (`zlib.h`), and PTY headers
-(`pty.h` / `util.h`), plus link libs `-lz` and `-lutil`. `make bdd` checks
-these and prints what is missing; it does not install packages.
 
 ```bash
 make
 make bdd
 ```
-
-If `make docker-bdd` ran earlier, it writes `BDD/runner/bdd_runner.linux` and
-does not overwrite the host runner. If an old Linux `bdd_runner` is still on
-the mount, `make bdd` removes it and rebuilds for the host.
 
 ## Docker
 
@@ -31,19 +34,8 @@ the mount, `make bdd` removes it and rebuilds for the host.
 make docker-bdd
 ```
 
-Image includes `zlib1g-dev`. First run rebuilds the image when needed.
-
 ## Binary selection
 
 1. `DEALERDESK_BIN` if set
-2. `build-docker/dealerdesk` inside Docker (`/.dockerenv` or `DEALERDESK_BDD_DOCKER=1`)
+2. `build-docker/dealerdesk` inside Docker
 3. Otherwise `build/dealerdesk`, then `build-docker/dealerdesk`
-
-## Layout
-
-| Path | Role |
-|------|------|
-| `BDD/features/` | All Gherkin (CTest contract + `@terminal` flows) |
-| `BDD/runner/` | Feature parser, console session, screenshot |
-| `BDD/step_definitions/` | Step implementations |
-| `BDD/artifacts/` | PNG screenshots for fleet happy paths |
