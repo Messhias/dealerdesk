@@ -19,7 +19,7 @@ answer. This board records that choice.
 | `docs/DOCKER.md` | Written when Phase 1 is executed |
 | `ISSUES.MD` | Local issue notes (linked from phase follow-ups) |
 | `AGENTS.md` | Project rules for agents |
-| `NOTES.md` | Final ≤2-page write-up (Phase 5) |
+| `NOTES.md` | Final ≤2-page write-up (Phase 6) |
 
 ## How to use this board
 
@@ -28,7 +28,8 @@ answer. This board records that choice.
    row to `docs/JOURNAL.md` (date, phase, task id, SHA, short note).
 3. Do **not** start Phase 4 (fleet) until Phases 1–3 exist and baseline tests +
    gate are green.
-4. Do **not** open a PR against the upstream original challenge repository.
+4. Do **not** start Phase 5 (E2E) until Phase 4 fleet acceptance is green.
+5. Do **not** open a PR against the upstream original challenge repository.
 
 ## Standing decisions (apply to every phase)
 
@@ -37,12 +38,12 @@ answer. This board records that choice.
 | Order | Harden delivery first, then fleet through that path |
 | BDD | Gherkin in `features/` = **behaviour / acceptance contract** (PO language → what the system must do). Not an “implementation spec”. |
 | TDD | C tests via CMake/CTest verify those scenarios 1:1 (stable scenario titles ↔ test names). |
-| Gherkin runner | **Out of scope now.** Keep features parser-friendly for a future Cucumber/Behave-style runner. |
-| Trusted quality | **Docker + CTest/TDD** (+ Docker pre-run gate). |
+| Gherkin runner | **In scope in Phase 5** (E2E against the real binary + terminal PNG proof). Features stay the acceptance contract; CTest/TDD remains the unit/seam gate. |
+| Trusted quality | **Docker + CTest/TDD** (+ Docker pre-run gate). Phase 5 E2E is additional proof, not a replacement. |
 | Multi-OS releases | GitHub Release binaries for Windows / macOS / Linux are a **CI/CD demonstration only**. **No** sanity-test suite on those artifacts. Out-of-Docker use is **user discretion**. Never call them production-certified. |
 | Staff impact | Apart from intentional fleet behaviour, quotes/invoices stay correct **to the penny**. |
 | Ambiguity | Reasonable call + write it down (JOURNAL / NOTES). |
-| Ornament cuts | No Cucumber runtime, no Docker beauty contest, no Help/README archaeology, no features outside `TICKET-142.md`. |
+| Ornament cuts | No Docker beauty contest, no Help/README archaeology, no product features outside `TICKET-142.md`. Phase 5 runner is intentional thin E2E, not a Cucumber showcase. |
 | App version | In-app banner version lives only in `version.h` (`DEALERDESK_VERSION`). Do **not** hardcode version literals in `screen.c` or elsewhere. CD bumps `version.h` with `RELEASE.txt` on each master release so tag, Release notes, and binary header match. Manual bump only via an explicit release task. |
 
 ---
@@ -177,15 +178,46 @@ check; non-fleet totals unchanged to the penny.
 
 ---
 
-## Phase 5 — NOTES and submission shape
+## Phase 5 — Gherkin E2E + terminal proof
 
-**Why this phase exists:** Required deliverable. Interviewers read history,
-agent setup, and a short NOTES file.
+**Branch:** `feature/gherkin-e2e-terminal`
+
+**Why this phase exists:** `features/*.feature` are the acceptance contract.
+Phase 5 gives them an operational path: a runner drives the real `dealerdesk`
+binary through UI flows, asserts production behaviour, and captures one PNG per
+happy path as human-visible E2E evidence. CTest/TDD stays the unit/seam gate.
+
+**Assertions:** Primary checks are against production (stdout / persisted state
+from the binary). PNGs are visual proof; optional PNG asserts are acceptable
+because the UI is a stable terminal, not a designed GUI.
+
+**Out of scope here:** Rewriting all six feature files as E2E; pure pricing
+math (stays CTest); Cucumber beauty contest; changing non-fleet totals.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P5-1 | [ ] | Write `NOTES.md` (≤2 pages) | Challenge requires it | Use JOURNAL + git history: what/why priority, one agent miss + how caught, assumptions, next with more time |
-| P5-2 | [ ] | Confirm agent setup + todo↔SHA completeness; no upstream PR | Submission shape | Check rules/skills/scripts/workflows in repo; JOURNAL complete; own remote only |
+| P5-1 | [ ] | Scaffold E2E runner in Docker (Gherkin → drive `dealerdesk`) | Wire `.feature` steps to the real binary | Behave (or equivalent) + PTY/`pexpect`; isolated temp `data/`; document in `docs/DOCKER.md` |
+| P5-2 | [ ] | E2E assert: mark existing customer as fleet | TICKET-142 / `fleet.feature` via UI | Steps + asserts on stdout/state; production binary, not seam-only |
+| P5-3 | [ ] | PNG for “mark existing as fleet” flow | Human-visible E2E proof (+ optional PNG assert) | Capture after steps; artifact in repo or CI artifacts |
+| P5-4 | [ ] | E2E assert: fleet quote shows “Fleet discount” line and total | Ticket quote acceptance on the terminal | Navigate menus; assert binary text/totals |
+| P5-5 | [ ] | PNG for “fleet quote” flow | Second visual E2E proof | Same capture pipeline as P5-3 |
+| P5-6 | [ ] | make/docker target (+ CI if it fits) for the E2E suite | Repeatable habit; CTest remains trusted unit gate | `make e2e` / compose; fail closed on the chosen path; no staff-visible product change |
+
+**Done when:** Both fleet UI flows are green on production asserts, one PNG
+exists per flow, docs explain how to run the suite, and checkboxes are marked
+only after implementation (not at board-planning time).
+
+---
+
+## Phase 6 — NOTES and submission shape
+
+**Why this phase exists:** Required deliverable. Interviewers read history,
+agent setup, and a short NOTES file. This remains the **last** phase.
+
+| ID | Status | What | Why | How (when executing) |
+|----|--------|------|-----|----------------------|
+| P6-1 | [ ] | Write `NOTES.md` (≤2 pages) | Challenge requires it | Use JOURNAL + git history: what/why priority, one agent miss + how caught, assumptions, next with more time |
+| P6-2 | [ ] | Confirm agent setup + todo↔SHA completeness; no upstream PR | Submission shape | Check rules/skills/scripts/workflows in repo; JOURNAL complete; own remote only |
 
 **Done when:** `NOTES.md` exists, setup is in-repo, history tells the story,
 nothing was PRed to `felipeamarante/dealerdesk`.
@@ -196,8 +228,9 @@ nothing was PRed to `felipeamarante/dealerdesk`.
 
 ```text
 P0 docs/rules  →  P1 Docker/CMake  →  P2 baseline BDD/TDD
-  →  P3 gate + CI/CD demo  →  P4 TICKET-142  →  P5 NOTES
+  →  P3 gate + CI/CD demo  →  P4 TICKET-142
+  →  P5 Gherkin E2E + PNG  →  P6 NOTES
 ```
 
-Implementation of Phases 1–5 starts only when we explicitly begin that phase’s
+Implementation of Phases 1–6 starts only when we explicitly begin that phase’s
 branch. Until then, this file is the contract for what we will build.
