@@ -29,7 +29,9 @@ answer. This board records that choice.
 3. Do **not** start Phase 4 (fleet) until Phases 1–3 exist and baseline tests +
    gate are green.
 4. Do **not** start Phase 5 (E2E) until Phase 4 fleet acceptance is green.
-5. Do **not** open a PR against the upstream original challenge repository.
+5. Do **not** start Phase 6 (NOTES) until Phase 5 **Done when** is true,
+   including follow-ups P5-7..P5-13 (P5-1..P5-6 alone is not enough).
+6. Do **not** open a PR against the upstream original challenge repository.
 
 ## Standing decisions (apply to every phase)
 
@@ -182,17 +184,28 @@ check; non-fleet totals unchanged to the penny.
 
 **Branch:** `feature/gherkin-e2e-terminal`
 
-**Why this phase exists:** `BDD/features/*.feature` are the acceptance contract.
-Phase 5 gives them an operational path: a runner drives the real `dealerdesk`
-binary through UI flows, asserts production behaviour, and captures one PNG per
-happy path as human-visible E2E evidence. CTest/TDD stays the unit/seam gate.
+**Why this phase exists:** `BDD/features/*.feature` are the acceptance contract
+(BDD). CTest under `tests/` is the TDD proof for unit/seam scenarios (1:1).
+`BDD/runner` drives the real `dealerdesk` binary for scenarios tagged
+`@terminal`, asserts production behaviour (stdout / persisted state), and can
+capture PNGs as human-visible E2E evidence. BDD and TDD stay together; the
+runner is the UI path, not a replacement for CTest.
 
 **Assertions:** Primary checks are against production (stdout / persisted state
 from the binary). PNGs are visual proof; optional PNG asserts are acceptable
 because the UI is a stable terminal, not a designed GUI.
 
-**Out of scope here:** Rewriting all six feature files as E2E; pure pricing
-math (stays CTest); Cucumber beauty contest; changing non-fleet totals.
+**Standing split (do not blur):**
+
+| Layer | Features / scenarios | Who runs them |
+|-------|----------------------|---------------|
+| Gherkin + CTest only | `pricing.feature`, `persistence.feature` (+ unit `rnd2`) | `ctest` / `make test` / `make docker-test` |
+| Gherkin + CTest today; **must** also gain `@terminal` | stock, customers (beyond mark-fleet), quote/sell, remaining fleet UX (add new as F) | CTest now; `make bdd` / `make docker-bdd` when P5-8..P5-11 land |
+| `@terminal` already | smoke Main Menu; mark existing as fleet; fleet quote (+ 2 PNGs) | `make bdd` / `make docker-bdd` |
+
+**Out of scope here:** Cucumber beauty contest; changing non-fleet totals;
+forcing `@terminal` onto pure `calc_quote` / flat-file persistence math (those
+stay Gherkin contract + CTest).
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
@@ -202,10 +215,18 @@ math (stays CTest); Cucumber beauty contest; changing non-fleet totals.
 | P5-4 | [x] | E2E assert: fleet quote shows “Fleet discount” line and total | Ticket quote acceptance on the terminal | `@terminal` feature + steps on production binary |
 | P5-5 | [x] | PNG for “fleet quote” flow | Second visual E2E proof | `BDD/artifacts/fleet_quote.png` |
 | P5-6 | [x] | make/docker target (+ CI if it fits) for the BDD suite | Repeatable habit; CTest remains trusted unit gate | `make bdd` / `make docker-bdd`; fail closed on that path |
+| P5-7 | [ ] | Board documents CTest-only vs `@terminal` split | Stop treating Phase 5 as “done” while menu flows lack UI proof | This standing-split table; pricing/persistence stay CTest; no fake `@terminal` on calc/file seams |
+| P5-8 | [ ] | `@terminal` stock UI scenarios + steps; green | Stock is daily dealer ops; needs binary proof | Tag/write stock terminal scenarios; steps in `BDD/step_definitions/`; assert stdout/state; `make bdd` green |
+| P5-9 | [ ] | `@terminal` customers UI scenarios + steps; green | Add/find/list R/T beyond mark-fleet | Tag/write customers terminal scenarios; steps; assert stdout/state; `make bdd` green |
+| P5-10 | [ ] | `@terminal` quote/sell UI scenarios + steps; green | Quote/sell encode sold-block and invoice packing on the real UI | Tag/write quote/sell terminal scenarios; steps; assert stdout/state; `make bdd` green |
+| P5-11 | [ ] | `@terminal` add new customer as fleet; green | Ticket: staff can mark fleet on new customers too | Terminal flow for type F on add; assert stdout/state; `make bdd` green |
+| P5-12 | [ ] | PNG per new happy path (or assert-only if agreed) | Same visual bar as P5-3/P5-5 | Screen-emulation PNGs under `BDD/artifacts/`; skip only if explicitly agreed when executing |
+| P5-13 | [ ] | Full `make bdd` + `make docker-bdd` green; then mark phase done | Phase 5 is incomplete until menu UI proof exists | Host + Docker suite green; CTest still green; checkboxes only after implementation |
 
-**Done when:** Both fleet UI flows are green on production asserts, one PNG
-exists per flow, docs explain how to run the suite, and checkboxes are marked
-only after implementation (not at board-planning time).
+**Done when:** P5-7..P5-13 are done; CTest remains green; non-fleet totals
+unchanged to the penny; docs explain host and Docker BDD runs. Phase 5 is
+**not** done after P5-1..P5-6 alone. Do **not** start Phase 6 until this
+**Done when** is true.
 
 ---
 
@@ -213,6 +234,8 @@ only after implementation (not at board-planning time).
 
 **Why this phase exists:** Required deliverable. Interviewers read history,
 agent setup, and a short NOTES file. This remains the **last** phase.
+
+**Blocked until:** Phase 5 **Done when** (including P5-7..P5-13) is satisfied.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
@@ -229,8 +252,10 @@ nothing was PRed to `felipeamarante/dealerdesk`.
 ```text
 P0 docs/rules  →  P1 Docker/CMake  →  P2 baseline BDD/TDD
   →  P3 gate + CI/CD demo  →  P4 TICKET-142
-  →  P5 Gherkin E2E + PNG  →  P6 NOTES
+  →  P5 Gherkin E2E + PNG (incl. P5-7..P5-13)  →  P6 NOTES
 ```
+
+Do **not** start Phase 6 until Phase 5 follow-ups P5-7..P5-13 are green.
 
 Implementation of Phases 1–6 starts only when we explicitly begin that phase’s
 branch. Until then, this file is the contract for what we will build.
