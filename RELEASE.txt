@@ -9,10 +9,30 @@ HOW TO RELEASE DEALERDESK
 5. Email the showrooms that a new version is out
 6. If something breaks, copy dealerdesk.old back
 
-Last release: 2.6 (2026-11-17)
+Last release: 2.7 (2026-11-18)
 
 Modern release history
 ======================
+
+2.7 (2026-11-18)
+------------------
+## DealerDesk v2.7 (CI/CD delivery demo)
+
+**This release is a demonstration of the delivery loop only.**
+
+- There is **no** sanity-test suite around these host binaries.
+- Out-of-Docker use is at the **user's discretion**.
+- Trusted quality path remains **Docker + CTest** (local pre-run gate and CI on Debian Bookworm).
+- Do **not** treat these artifacts as production-certified.
+
+### Assets
+- `dealerdesk-windows.exe`
+- `dealerdesk-linux`
+
+### Changes since v2.6
+
+- Phase 4: fleet discount (TICKET-142) and single-source version.h (#15) (92709b4)
+
 
 2.6 (2026-11-17)
 ------------------
