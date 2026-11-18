@@ -5,7 +5,7 @@ Feature: Quote pricing for retail and trade customers
 
   # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
   # Truth: docs/SYSTEM.md Pricing and calc_quote in calc.c
-  # No fleet customer type in this feature.
+  # Retail/trade goldens only. Fleet scenarios live in features/fleet.feature.
 
   Scenario: Retail quote with salesman 5% and trade-in matches invoice 50230
     Given a list price of 9295.00
