@@ -43,3 +43,8 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-17 | P3 | P3-4 | e2f6b22 | cd-release.yml: tag v2.4+ + Win/macOS/Linux Release; workflow_dispatch dry_run; UNIX-only libm |
 | 2026-11-17 | P3 | P3-5 | 3e63551 | RELEASE.txt + CD notes automation; drop macOS from CD matrix (Win+Linux); catch-up Last release 2.4 |
 | 2026-11-17 | P3 | ISSUE-002 | bafe0c7 | Fix CD gh release without .git (checkout + --repo); CI PR-only; recover v2.5 Release; ISSUES.md + TASKS follow-up |
+| 2026-11-18 | P4 | P4-1 | 3394dee | features/fleet.feature + retail/trade regression comments in pricing/customers features |
+| 2026-11-18 | P4 | P4-2 | fce4332 | test_fleet.c + CMake registration; scenarios 1:1 with fleet.feature |
+| 2026-11-18 | P4 | P4-3 | 84fd08b | type F, fleet_disc 4%, set-type UX, quote line, invoice packing; SYSTEM.md; 44/44 Docker |
+| 2026-11-18 | P4 | P4-4 | 6dbc516 | TASKS Phase 4 checkboxes done; app-version standing decision on the board |
+| 2026-11-18 | — | version | e5df27f | version.h single source; CD bumps with RELEASE.txt; AGENTS/rules/README aligned |
