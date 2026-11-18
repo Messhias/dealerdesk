@@ -30,9 +30,11 @@ Stored in `data/stock.dat`. Limits: `MAX_VEH` 500 (`globals.h`).
 |--------|---------|
 | `R` | Retail |
 | `T` | Trade |
+| `F` | Fleet |
 
 Fields: id, name, phone, email, type. Stored in `data/customers.dat`.
-Limits: `MAX_CUST` 500.
+Limits: `MAX_CUST` 500. Staff can set type when adding a customer or via
+Customers → Set customer type (for existing records such as Greenway Taxis).
 
 ### Invoices
 
@@ -70,27 +72,34 @@ List, add, find, change price, reserve/release, list/view invoices. See
 ### Order of calculation (`calc_quote`)
 
 1. `list` = vehicle list price
-2. Trade discount: if customer type is `T`, `10%` of list (rounded to 2
-   decimals)
+2. Automatic discount (exclusive; one type only):
+   - Trade (`T`): `10%` of list (rounded to 2 decimals) → `trade_disc`
+   - Fleet (`F`): `4%` of list (rounded to 2 decimals) → `fleet_disc`
+   - Retail (`R`): both stay 0
 3. Salesman discount: percent forced into `[0, 15]`, then applied to
-   `(list - trade_disc)`
-4. `net` = list − trade_disc − salesman_disc
+   `(list - trade_disc - fleet_disc)`
+4. `net` = list − trade_disc − fleet_disc − salesman_disc
 5. `delivery` = 150.00
 6. `vat` = 20% of `(net + delivery)` (rounded to 2 decimals)
 7. `reg_fee` = 55.00
 8. `total` = net + delivery + vat + reg_fee − tradein
+
+Fleet discount applies to the vehicle list price only. Delivery and
+registration fees are never discounted.
 
 ### How a price is built (plain words)
 
 Start with the car's list price.
 
 If the customer is Trade (type `T`), take 10% off that list price.
-Retail customers (type `R`) skip this step.
+If the customer is Fleet (type `F`), take 4% off that list price instead.
+Retail customers (type `R`) skip this step. A customer cannot be both
+trade and fleet (one type character).
 
 Then the salesman may give extra % off. That % can only be from 0 to 15.
 If someone types -3, the program uses 0. If someone types 40, the program
-uses 15. This second discount is calculated on what is left after the trade
-discount (not on the full list again).
+uses 15. This second discount is calculated on what is left after the
+automatic trade or fleet discount (not on the full list again).
 
 What is left is the net price.
 
@@ -173,12 +182,13 @@ These three examples match the sample rows in `data/invoices.dat`.
 
 ### Screen vs saved invoice
 
-On screen, a quote shows the trade discount and the salesman discount on
-separate lines.
+On screen, a quote shows the trade discount, the fleet discount, and the
+salesman discount on separate lines (each only when non-zero).
 
-In `data/invoices.dat` those two discounts are saved as one number (`disc` =
-trade discount + salesman discount). Delivery and registration are saved as
-one fees number: 150.00 + 55.00 = 205.00.
+In `data/invoices.dat` those discounts are saved as one number (`disc` =
+trade + fleet + salesman). Delivery and registration are saved as one fees
+number: 150.00 + 55.00 = 205.00. Viewing an old invoice still shows a single
+"Discounts" line with that packed total.
 
 ### Notes
 
@@ -204,6 +214,7 @@ one fees number: 150.00 + 55.00 = 205.00.
 | `calc.c` / `calc.h` | Quote pricing |
 | `dbfile.c` / `dbfile.h` | Load/save flat files |
 | `screen.c` / `screen.h` | Terminal I/O helpers |
+| `version.h` | In-app version (`DEALERDESK_VERSION`) |
 | `globals.h` | Shared structs and limits |
 
 ## Build (what works today)
@@ -220,10 +231,19 @@ Run from the repo root so `data/` resolves correctly.
 ## Challenge context (not implemented here)
 
 - `BRIEF.md` — take-home goals (delivery hardening + feature work)
-- `TICKET-142.md` — fleet discount (pending)
+- `TICKET-142.md` — fleet discount (type `F`, 4% off list; see Pricing)
+
+## App version banner
+
+The terminal header prints `DEALERDESK v` plus `DEALERDESK_VERSION` from
+`version.h` (via `screen.c`). That define is the single source for the in-app
+version. On each CD release to `master`, `scripts/update-release-txt.sh`
+updates `RELEASE.txt` and `version.h` to the same version before the tag, so
+the GitHub Release and the binary banner match.
 
 ## Known doc drift
 
-The shipped `README.md` still describes paths, VAT base, trade %, manager PIN,
-reports/`report.c`, and version strings that do not match the current code.
-Do not treat the README as behavioural truth without checking the sources.
+The shipped `README.md` may still describe paths, VAT base, trade %, manager
+PIN, or `reports/`/`report.c` that do not match the current code. Do not treat
+the README as behavioural truth without checking the sources. Banner version
+truth is `version.h`, not older README titles.
