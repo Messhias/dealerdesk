@@ -132,6 +132,23 @@ int console_prepare_workdir(char *workdir, size_t buflen, const char *repo_root)
     return 0;
 }
 
+int console_prepare_empty_workdir(char *workdir, size_t buflen)
+{
+    char tmpl[] = "/tmp/ddbddXXXXXX";
+    char *root;
+    char data_dir[600];
+
+    root = mkdtemp(tmpl);
+    if (!root)
+        return -1;
+
+    snprintf(workdir, buflen, "%s", root);
+    snprintf(data_dir, sizeof data_dir, "%s/data", workdir);
+    if (mkdir(data_dir, 0700) != 0)
+        return -1;
+    return 0;
+}
+
 static void clear_console(Console *c)
 {
     memset(c, 0, sizeof *c);
@@ -159,6 +176,7 @@ int console_start(Console *c, const char *binary, const char *workdir)
     }
 
     snprintf(c->workdir, sizeof c->workdir, "%s", workdir);
+    snprintf(c->binary, sizeof c->binary, "%s", binary);
     c->owns_workdir = 1;
 
     {
@@ -237,6 +255,15 @@ int console_saw(const Console *c, const char *needle)
     return strstr(c->out, needle) != NULL;
 }
 
+int console_saw_from(const Console *c, size_t from, const char *needle)
+{
+    if (!c || !needle || !needle[0])
+        return 0;
+    if (from > c->out_len)
+        from = c->out_len;
+    return strstr(c->out + from, needle) != NULL;
+}
+
 static int append_read(Console *c)
 {
     char buf[2048];
@@ -263,37 +290,52 @@ static int append_read(Console *c)
 int console_expect(Console *c, const char *needle, int timeout_ms)
 {
     int elapsed = 0;
-    const int slice = 50;
 
-    if (!c || c->master_fd < 0 || !needle)
+    if (!c || c->master_fd < 0 || !needle || !needle[0])
         return -1;
-    if (console_saw(c, needle))
-        return 0;
+
+    /*
+     * Only match text that arrives after this call. Matching the whole
+     * scrollback reuses old prompts (e.g. "Customer ID" from mark-fleet)
+     * and desynchronizes input → garbled screenshots.
+     */
+    const size_t mark = c->out_len;
 
     while (elapsed <= timeout_ms) {
+        const int slice = 50;
         fd_set rfds;
         struct timeval tv;
-        int ready;
+
+        if (c->out_len > mark && strstr(c->out + mark, needle))
+            return 0;
 
         FD_ZERO(&rfds);
         FD_SET(c->master_fd, &rfds);
+        
         tv.tv_sec = 0;
         tv.tv_usec = slice * 1000;
 
-        ready = select(c->master_fd + 1, &rfds, NULL, NULL, &tv);
+        const int ready = select(c->master_fd + 1, &rfds, NULL, NULL, &tv);
+        
         if (ready > 0 && FD_ISSET(c->master_fd, &rfds)) {
+            
             if (append_read(c) < 0)
                 return -1;
-            if (console_saw(c, needle))
+            
+            if (c->out_len > mark && strstr(c->out + mark, needle))
                 return 0;
+            
         } else if (ready == 0) {
+            
             elapsed += slice;
         } else if (errno != EINTR) {
+            
             return -1;
         }
     }
 
     fprintf(stderr, "expect timeout waiting for: %s\n", needle);
+    
     return -1;
 }
 

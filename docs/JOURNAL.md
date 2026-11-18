@@ -49,3 +49,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-18 | P4 | P4-4 | 6dbc516 | TASKS Phase 4 checkboxes done; app-version standing decision on the board |
 | 2026-11-18 | — | version | e5df27f | version.h single source; CD bumps with RELEASE.txt; AGENTS/rules/README aligned |
 | 2026-11-18 | P5 | P5-1..P5-6 | 2c7d362 | BDD/ tree (features+runner+steps); @terminal fleet flows; PNGs; make bdd/docker-bdd; host/Docker binary split |
+| 2026-11-18 | P5 | P5-7..P5-10 | pending-sha | All existing scenarios @terminal; per-feature steps; CMake bdd_runner; PNGs under artifacts/<feature>/; board aligned |

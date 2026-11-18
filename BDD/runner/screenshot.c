@@ -4,6 +4,7 @@
  * DealerDesk clears with CSI 2J / CSI H. We replay the byte stream into a
  * fixed grid so the PNG shows the final screen, not the whole scrollback.
  */
+// ReSharper disable CppTooWideScope
 #include "screenshot.h"
 
 #include <stdio.h>
@@ -324,12 +325,27 @@ static int write_chunk(FILE *fp, const char *type, const unsigned char *data, si
     return fwrite(crcbuf, 1, 4, fp) == 4 ? 0 : -1;
 }
 
-int screenshot_write_png(const char *text, const char *path)
+static unsigned long screen_hash(const TermScreen *s)
 {
-    TermScreen screen;
-    int rows, cols, img_w, img_h, r, c;
-    unsigned char *img = NULL;
-    unsigned char *raw = NULL;
+    unsigned long h = 2166136261UL;
+    int r, c;
+    int rows = used_rows(s);
+    int cols = used_cols(s, rows);
+
+    for (r = 0; r < rows; r++) {
+        for (c = 0; c < cols; c++) {
+            h ^= (unsigned char)s->cells[r][c];
+            h *= 16777619UL;
+        }
+        h ^= '\n';
+        h *= 16777619UL;
+    }
+    return h;
+}
+
+static int screenshot_write_from_screen(TermScreen *screen, const char *path)
+{
+    int r;
     unsigned char *zbuf = NULL;
     uLongf zlen;
     FILE *fp = NULL;
@@ -339,21 +355,20 @@ int screenshot_write_png(const char *text, const char *path)
     const unsigned char bg[3] = {30, 30, 30};
     const unsigned char fg[3] = {220, 220, 220};
 
-    if (!text || !path)
-        return -1;
-
-    screen_clear(&screen);
-    screen_feed(&screen, text);
-    rows = used_rows(&screen);
-    cols = used_cols(&screen, rows);
+    int rows = used_rows(screen);
+    const int cols = used_cols(screen, rows);
+    
     if (rows < 8)
         rows = 8;
 
-    img_w = cols * GLYPH_W * SCALE + PAD * 2;
-    img_h = rows * GLYPH_H * SCALE + PAD * 2;
-    img = (unsigned char *)malloc((size_t)img_w * (size_t)img_h * 3);
+    const int img_w = cols * GLYPH_W * SCALE + PAD * 2;
+    const int img_h = rows * GLYPH_H * SCALE + PAD * 2;
+    
+    unsigned char* img = malloc((size_t)img_w * (size_t)img_h * 3);
+    
     if (!img)
         return -1;
+    
     for (r = 0; r < img_w * img_h; r++) {
         img[r * 3] = bg[0];
         img[r * 3 + 1] = bg[1];
@@ -361,8 +376,8 @@ int screenshot_write_png(const char *text, const char *path)
     }
 
     for (r = 0; r < rows; r++) {
-        for (c = 0; c < cols; c++) {
-            char ch = screen.cells[r][c];
+        for (int c = 0; c < cols; c++) {
+            const char ch = screen->cells[r][c];
             if (ch == ' ')
                 continue;
             blit_glyph(img, img_w,
@@ -372,9 +387,11 @@ int screenshot_write_png(const char *text, const char *path)
         }
     }
 
-    raw = (unsigned char *)malloc((size_t)(img_w * 3 + 1) * (size_t)img_h);
+    unsigned char* raw = malloc((size_t)(img_w * 3 + 1) * (size_t)img_h);
+    
     if (!raw)
         goto done;
+    
     for (r = 0; r < img_h; r++) {
         raw[r * (img_w * 3 + 1)] = 0;
         memcpy(raw + r * (img_w * 3 + 1) + 1, img + r * img_w * 3, (size_t)img_w * 3);
@@ -382,16 +399,21 @@ int screenshot_write_png(const char *text, const char *path)
 
     zlen = compressBound((uLong)((img_w * 3 + 1) * img_h));
     zbuf = (unsigned char *)malloc(zlen);
+    
     if (!zbuf)
         goto done;
+    
     if (compress2(zbuf, &zlen, raw, (uLong)((img_w * 3 + 1) * img_h), 9) != Z_OK)
         goto done;
 
     fp = fopen(path, "wb");
+    
     if (!fp)
         goto done;
+    
     if (fwrite(sig, 1, 8, fp) != 8)
         goto done;
+    
     ihdr[0] = (unsigned char)((img_w >> 24) & 0xff);
     ihdr[1] = (unsigned char)((img_w >> 16) & 0xff);
     ihdr[2] = (unsigned char)((img_w >> 8) & 0xff);
@@ -405,12 +427,16 @@ int screenshot_write_png(const char *text, const char *path)
     ihdr[10] = 0;
     ihdr[11] = 0;
     ihdr[12] = 0;
+    
     if (write_chunk(fp, "IHDR", ihdr, 13) != 0)
         goto done;
-    if (write_chunk(fp, "IDAT", zbuf, (size_t)zlen) != 0)
+    
+    if (write_chunk(fp, "IDAT", zbuf, zlen) != 0)
         goto done;
+    
     if (write_chunk(fp, "IEND", NULL, 0) != 0)
         goto done;
+    
     rc = 0;
 
 done:
@@ -420,4 +446,34 @@ done:
     free(raw);
     free(img);
     return rc;
+}
+
+int screenshot_write_png(const char *text, const char *path)
+{
+    TermScreen screen;
+
+    if (!text || !path)
+        return -1;
+    screen_clear(&screen);
+    screen_feed(&screen, text);
+    return screenshot_write_from_screen(&screen, path);
+}
+
+int screenshot_write_png_unique(const char *text, const char *path,
+                                unsigned long *last_hash)
+{
+    TermScreen screen;
+    unsigned long h;
+
+    if (!text || !path || !last_hash)
+        return -1;
+    screen_clear(&screen);
+    screen_feed(&screen, text);
+    h = screen_hash(&screen);
+    if (*last_hash != 0 && h == *last_hash)
+        return 1;
+    if (screenshot_write_from_screen(&screen, path) != 0)
+        return -1;
+    *last_hash = h;
+    return 0;
 }

@@ -8,12 +8,14 @@ Feature: Customer add find and list
   # Truth exercised via customer.c seams used by main.c (no stdin).
   # Baseline R and T add/find/list. Fleet add/mark lives in BDD/features/fleet.feature.
 
+  @terminal
   Scenario: Adding a customer requires a non-empty name
     Given an empty customer table
     When add is attempted with an empty name
     Then the add fails
     And the customer table remains empty
 
+  @terminal
   Scenario: Valid add assigns next customer id and default retail type
     Given an empty customer table
     And next customer id 2101
@@ -24,6 +26,7 @@ Feature: Customer add find and list
     And that customer type is retail
     And next customer id is 2102
 
+  @terminal
   Scenario: Valid add with trade confirmed sets type T
     Given an empty customer table
     And next customer id 2105
@@ -33,6 +36,7 @@ Feature: Customer add find and list
     And that customer type is trade
     And next customer id is 2106
 
+  @terminal
   Scenario: Add is rejected when customer table is full
     Given a full customer table
     And next customer id 2999
@@ -40,6 +44,7 @@ Feature: Customer add find and list
     Then the add fails
     And next customer id is still 2999
 
+  @terminal
   Scenario: Find by name uses case-sensitive substring match
     Given one customer named Sarah Whitfield
     When find by name uses Whit
@@ -47,16 +52,19 @@ Feature: Customer add find and list
     When find by name uses whit
     Then the match count is 0
 
+  @terminal
   Scenario: Find with empty substring matches all customers
     Given two customers named Sarah Whitfield and Tom Bradley
     When find by name uses an empty substring
     Then the match count is 2
 
+  @terminal
   Scenario: Find with no matching substring returns zero matches
     Given one customer named Sarah Whitfield
     When find by name uses ZZZZ
     Then the match count is 0
 
+  @terminal
   Scenario: List customers includes every stored customer
     Given one retail customer
     And one trade customer

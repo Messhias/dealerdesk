@@ -116,8 +116,12 @@ legacy `gcc -o dealerdesk *.c -lm` one-liner.
 C harness under `BDD/` (features, runner, step definitions). Full instructions:
 `BDD/runner/README.md`.
 
+This suite is **not** part of GitHub Actions CI. CI stays CMake/CTest only
+(Phase 3 gate). Run the terminal BDD suite locally or in Docker when you want
+`@terminal` / PNG proof:
+
 ```bash
-make bdd          # host: build/ + bdd_runner
+make bdd          # host: build/dealerdesk + build/bdd_runner (CMake)
 make docker-bdd   # same suite in the image (build-docker/)
 ```
 

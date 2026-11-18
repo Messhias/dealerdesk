@@ -7,16 +7,19 @@ Feature: Quote and sell vehicle
   # Truth: docs/SYSTEM.md Quote / Sell / Screen vs saved invoice, and main.c sell path.
   # Tests prefer sale seams (no stdin). Cancel means the sale is not applied.
 
+  @terminal
   Scenario: Sold vehicle cannot be quoted
     Given a vehicle with status sold
     When quote eligibility is checked
     Then the vehicle cannot be quoted
 
+  @terminal
   Scenario: Available vehicle can be quoted
     Given a vehicle with status in stock
     When quote eligibility is checked
     Then the vehicle can be quoted
 
+  @terminal
   Scenario: Invoice packs trade and salesman discounts into disc
     Given a list price of 10000.00
     And a trade customer
@@ -27,6 +30,7 @@ Feature: Quote and sell vehicle
     Then the packed invoice disc is 1450.00
     # trade 10% of 10000.00 = 1000.00; salesman 5% of 9000.00 = 450.00; sum = 1450.00
 
+  @terminal
   Scenario: Invoice packs delivery and registration into fees 205.00
     Given a list price of 9295.00
     And a retail customer
@@ -37,6 +41,7 @@ Feature: Quote and sell vehicle
     Then the packed invoice fees are 205.00
     And the packed invoice disc is 464.75
 
+  @terminal
   Scenario: Confirming a sale marks vehicle sold and appends invoice
     Given a private temp working tree with a data directory
     And one in-stock vehicle id 1101 priced 9295.00
@@ -53,6 +58,7 @@ Feature: Quote and sell vehicle
     And the vehicle status is sold
     And next invoice number is 50234
 
+  @terminal
   Scenario: Cancelling a sale leaves stock and invoices unchanged
     Given a private temp working tree with a data directory
     And one in-stock vehicle id 1101 priced 9295.00

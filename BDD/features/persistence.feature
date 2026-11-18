@@ -8,6 +8,7 @@ Feature: Flat-file persistence under data/
   # CTest chdirs into a private temp tree with its own data/; repo data/ stays clean.
   # Production dbfile is unchanged (fixed relative data/ path).
 
+  @terminal
   Scenario: Load skips comment and empty lines in stock file
     Given a private temp working tree with a data directory
     And a stock.dat file with a comment line, a blank line, and one vehicle record
@@ -15,6 +16,7 @@ Feature: Flat-file persistence under data/
     Then exactly 1 vehicle is in memory
     And that vehicle id is 1001
 
+  @terminal
   Scenario: Load skips comment and empty lines in customers file
     Given a private temp working tree with a data directory
     And a customers.dat file with a comment line, a blank line, and one customer record
@@ -23,6 +25,7 @@ Feature: Flat-file persistence under data/
     And that customer id is 2001
     And that customer type is R
 
+  @terminal
   Scenario: Stock round-trip save then reload preserves the record
     Given a private temp working tree with a data directory
     And one vehicle in memory with id 1001 plate AB12 CDE
@@ -33,6 +36,7 @@ Feature: Flat-file persistence under data/
     And that vehicle plate is AB12 CDE
     And that vehicle list price is 10495.00
 
+  @terminal
   Scenario: Customers and next ids round-trip save then reload
     Given a private temp working tree with a data directory
     And one customer in memory with id 2001 name Sample Buyer type T
@@ -47,6 +51,7 @@ Feature: Flat-file persistence under data/
     And next customer id is 2009
     And next invoice number is 50233
 
+  @terminal
   Scenario: Missing data files leave empty tables without crashing
     Given a private temp working tree with an empty data directory
     And next ids preset to vehicle 1000 customer 2000 invoice 50000
@@ -58,6 +63,7 @@ Feature: Flat-file persistence under data/
     And next customer id remains 2000
     And next invoice number remains 50000
 
+  @terminal
   Scenario: Sample repo data loads expected counts and next ids
     Given the repository data directory
     When all data files are loaded

@@ -24,14 +24,14 @@ run: build
 	./$(BUILD_DIR)/dealerdesk
 
 # BDD terminal suite (C). Not part of the unit CTest gate.
-# Host and Docker must not share the same runner binary (ELF vs Mach-O).
-BDD_BIN := BDD/runner/bdd_runner
-BDD_BIN_DOCKER := BDD/runner/bdd_runner.linux
-BDD_SRCS := \
-	BDD/runner/main.c \
-	BDD/runner/console.c \
-	BDD/runner/screenshot.c \
-	BDD/step_definitions/terminal_steps.c
+# Built by CMake target bdd_runner into the build dir (same as dealerdesk).
+# Host uses $(BUILD_DIR)/; Docker uses $(DOCKER_BUILD_DIR)/ so ELF vs Mach-O
+# never share one binary path.
+BDD_BIN := $(BUILD_DIR)/bdd_runner
+BDD_BIN_DOCKER := $(DOCKER_BUILD_DIR)/bdd_runner
+# Legacy paths from the pre-CMake cc recipe (removed on clean).
+BDD_BIN_LEGACY := BDD/runner/bdd_runner
+BDD_BIN_LEGACY_LINUX := BDD/runner/bdd_runner.linux
 
 # Host prerequisites: warn clearly, never install packages from Make.
 bdd-host-check:
@@ -54,29 +54,16 @@ bdd-host-check:
 	  exit 1; \
 	}
 
-# Drop a Linux ELF left behind by docker-bdd on a macOS/Windows host mount.
-bdd-drop-foreign-bin:
-	@if [ -e $(BDD_BIN) ]; then \
-	  case "$$(file -b $(BDD_BIN) 2>/dev/null)" in \
-	    *ELF*) \
-	      echo "make bdd: removing foreign $(BDD_BIN) (built inside Docker); rebuilding for this host."; \
-	      rm -f $(BDD_BIN); \
-	      ;; \
-	  esac; \
-	fi
-
-$(BDD_BIN): $(BDD_SRCS) BDD/runner/console.h BDD/runner/screenshot.h BDD/step_definitions/steps.h
-	$(CC) -Wall -Wextra -O2 -I BDD/runner -o $(BDD_BIN) $(BDD_SRCS) -lutil -lz || { \
-	  echo "make bdd: host link failed (often -lz / -lutil)."; \
-	  echo "Check zlib and libutil are available to $(CC). Or use: make docker-bdd"; \
+bdd: build bdd-host-check
+	@test -x $(BDD_BIN) || { \
+	  echo "make bdd: missing $(BDD_BIN) (CMake target bdd_runner)."; \
+	  echo "Re-run: cmake -S . -B $(BUILD_DIR) && cmake --build $(BUILD_DIR)"; \
 	  exit 1; \
 	}
-
-bdd: build bdd-host-check bdd-drop-foreign-bin $(BDD_BIN)
-	DEALERDESK_BIN=./$(BUILD_DIR)/dealerdesk $(BDD_BIN)
+	DEALERDESK_BIN=./$(BUILD_DIR)/dealerdesk ./$(BDD_BIN)
 
 clean:
-	rm -rf $(BUILD_DIR) $(DOCKER_BUILD_DIR) $(BDD_BIN) $(BDD_BIN_DOCKER)
+	rm -rf $(BUILD_DIR) $(DOCKER_BUILD_DIR) $(BDD_BIN_LEGACY) $(BDD_BIN_LEGACY_LINUX)
 
 # Override image ENTRYPOINT so shell/test do not go through the pre-run gate.
 docker-shell:
@@ -89,14 +76,11 @@ docker-test:
 docker-run:
 	./scripts/run-with-tests.sh
 
-# Write a Docker-only runner binary so host make bdd is not clobbered.
+# Docker build dir keeps the Linux runner off the host Mach-O path.
 docker-bdd:
 	docker compose build dealerdesk
 	docker compose run --rm --entrypoint bash dealerdesk -lc \
 	  'cmake -S . -B $(DOCKER_BUILD_DIR) && cmake --build $(DOCKER_BUILD_DIR) && \
-	   cc -Wall -Wextra -O2 -I BDD/runner -o $(BDD_BIN_DOCKER) \
-	     BDD/runner/main.c BDD/runner/console.c BDD/runner/screenshot.c \
-	     BDD/step_definitions/terminal_steps.c -lutil -lz && \
 	   DEALERDESK_BDD_DOCKER=1 DEALERDESK_BIN=./$(DOCKER_BUILD_DIR)/dealerdesk \
 	   ./$(BDD_BIN_DOCKER)'
 
@@ -105,14 +89,14 @@ help:
 	@echo "  make          configure + build  -> $(BUILD_DIR)/"
 	@echo "  make test     build + ctest"
 	@echo "  make run      build + ./$(BUILD_DIR)/dealerdesk"
-	@echo "  make bdd      build + BDD terminal suite (host toolchain)"
-	@echo "  make clean    remove $(BUILD_DIR)/, $(DOCKER_BUILD_DIR)/, bdd runners"
+	@echo "  make bdd      build + BDD terminal suite (CMake target bdd_runner)"
+	@echo "  make clean    remove $(BUILD_DIR)/, $(DOCKER_BUILD_DIR)/, legacy BDD bins"
 	@echo ""
 	@echo "Docker (pinned toolchain, trusted path; uses $(DOCKER_BUILD_DIR)/):"
 	@echo "  make docker-shell   interactive bash (bypasses pre-run gate)"
 	@echo "  make docker-test    cmake + ctest only (bypasses pre-run gate)"
 	@echo "  make docker-run     pre-run gate then dealerdesk"
-	@echo "  make docker-bdd     same BDD terminal suite inside the image"
+	@echo "  make docker-bdd     same BDD suite inside the image (build-docker/bdd_runner)"
 	@echo "  ./scripts/run-with-tests.sh   same as make docker-run"
 	@echo ""
 	@echo "Legacy one-liner still works: gcc -o dealerdesk *.c -lm"
