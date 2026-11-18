@@ -20,3 +20,8 @@ include(CTest)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+# BDD terminal runner needs PTY + zlib (Unix host or Docker). Skip on Windows CD.
+if(UNIX)
+    add_subdirectory(BDD)
+endif()
