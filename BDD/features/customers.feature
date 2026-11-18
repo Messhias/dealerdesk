@@ -3,10 +3,10 @@ Feature: Customer add find and list
   I need customer add find and list rules to stay stable
   So that retail and trade customer ops do not drift from current behaviour
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: docs/SYSTEM.md Customers, and main.c customer path.
   # Truth exercised via customer.c seams used by main.c (no stdin).
-  # Baseline R and T add/find/list. Fleet add/mark lives in features/fleet.feature.
+  # Baseline R and T add/find/list. Fleet add/mark lives in BDD/features/fleet.feature.
 
   Scenario: Adding a customer requires a non-empty name
     Given an empty customer table

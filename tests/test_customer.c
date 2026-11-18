@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/customers.feature (production customer seams).
+ * CTest coverage for BDD/features/customers.feature (production customer seams).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  *
  * Calls customer.c rules used by main.c screens (no stdin, no mirrors).

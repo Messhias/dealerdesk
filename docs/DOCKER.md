@@ -111,6 +111,16 @@ make run
 See `README.md` (MODERN BUILD / TEST) for brew/apt install notes and the
 legacy `gcc -o dealerdesk *.c -lm` one-liner.
 
+## BDD terminal suite (host or Docker)
+
+C harness under `BDD/` (features, runner, step definitions). Full instructions:
+`BDD/runner/README.md`.
+
+```bash
+make bdd          # host: build/ + bdd_runner
+make docker-bdd   # same suite in the image (build-docker/)
+```
+
 ## After mutating sample data
 
 ```bash

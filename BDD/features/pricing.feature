@@ -3,9 +3,9 @@ Feature: Quote pricing for retail and trade customers
   I need quotes to use the current price build-up
   So that totals stay correct to the penny before any fleet change
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: docs/SYSTEM.md Pricing and calc_quote in calc.c
-  # Retail/trade goldens only. Fleet scenarios live in features/fleet.feature.
+  # Retail/trade goldens only. Fleet scenarios live in BDD/features/fleet.feature.
 
   Scenario: Retail quote with salesman 5% and trade-in matches invoice 50230
     Given a list price of 9295.00

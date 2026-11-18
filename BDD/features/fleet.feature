@@ -3,7 +3,7 @@ Feature: Fleet customer discount on quotes
   I need fleet customers to get an automatic 4% vehicle discount
   So that fleet contracts stay consistent and salesman discount stays free to negotiate
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: TICKET-142.md, docs/SYSTEM.md Pricing (after fleet), calc_quote in calc.c
   # Fleet type is F. Fees (delivery, registration) are not discounted.
   # Existing retail/trade totals must stay correct to the penny.

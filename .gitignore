@@ -1,3 +1,5 @@
 /build/
 /build-docker/
+/BDD/runner/bdd_runner
+/BDD/runner/bdd_runner.linux
 .idea/

@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/stock.feature (production stock seams).
+ * CTest coverage for BDD/features/stock.feature (production stock seams).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  *
  * Calls stock.c rules used by main.c screens (no stdin, no mirrors).

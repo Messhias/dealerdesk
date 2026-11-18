@@ -48,3 +48,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-18 | P4 | P4-3 | 84fd08b | type F, fleet_disc 4%, set-type UX, quote line, invoice packing; SYSTEM.md; 44/44 Docker |
 | 2026-11-18 | P4 | P4-4 | 6dbc516 | TASKS Phase 4 checkboxes done; app-version standing decision on the board |
 | 2026-11-18 | — | version | e5df27f | version.h single source; CD bumps with RELEASE.txt; AGENTS/rules/README aligned |
+| 2026-11-18 | P5 | P5-1..P5-6 | TBD | BDD/ tree (features+runner+steps); @terminal fleet flows; PNGs; make bdd/docker-bdd; host/Docker binary split |

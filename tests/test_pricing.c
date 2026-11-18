@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/pricing.feature (rnd2 / calc_quote).
+ * CTest coverage for BDD/features/pricing.feature (rnd2 / calc_quote).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  */
 #include <stdio.h>

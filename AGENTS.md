@@ -91,11 +91,11 @@ are part of the answer; see `docs/TASKS.md` for the chosen sequence.
 - Follow `docs/SDLC.md`. **BDD and TDD are mandatory** on every behaviour
   change: write scenarios first, then red → green → refactor. Do not ship
   production behaviour without that loop.
-- Acceptance scenarios live under `features/` as a behaviour/acceptance
+- Acceptance scenarios live under `BDD/features/` as a behaviour/acceptance
   contract (PO language). CTest runs the verifying C tests. Do not call
-  feature files an “implementation spec”. A Gherkin E2E runner (drive the
-  real binary + terminal PNG proof) is in scope as Phase 5 on `docs/TASKS.md`;
-  it does not replace CTest.
+  feature files an “implementation spec”. Terminal UI proof lives under `BDD/` (runner, step definitions, `@terminal`
+  features, PNG artifacts). Phase 5 on `docs/TASKS.md`; it does not replace
+  CTest.
 - Dealership staff rely on current behaviour. Outside an intentional ticket,
   keep quotes/invoices for existing customer types correct to the penny.
 - Run from repository root (`data/` is relative). Preferred controllable path:
