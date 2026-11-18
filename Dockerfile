@@ -7,6 +7,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

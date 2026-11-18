@@ -3,7 +3,7 @@ Feature: Flat-file persistence under data/
   I need stock, customers, invoices, and id counters to load and save reliably
   So that daily work survives restarts without corrupting production files
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: docs/SYSTEM.md Persistence and dbfile.c
   # CTest chdirs into a private temp tree with its own data/; repo data/ stays clean.
   # Production dbfile is unchanged (fixed relative data/ path).

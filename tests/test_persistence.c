@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/persistence.feature (dbfile load/save).
+ * CTest coverage for BDD/features/persistence.feature (dbfile load/save).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  *
  * Production dbfile keeps a fixed "data/" path. Tests chdir into a private
@@ -25,15 +25,17 @@ int      next_inv_no;
 static void write_data_file(const char *name, const char *contents)
 {
     char path[320];
-    FILE *f;
-
+    
     snprintf(path, sizeof path, "data/%s", name);
-    f = fopen(path, "w");
+    
+    FILE* f = fopen(path, "w");
+    
     if (!f) {
         perror(path);
         g_failures++;
         return;
     }
+    
     fputs(contents, f);
     fclose(f);
 }

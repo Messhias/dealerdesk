@@ -16,7 +16,7 @@ target_include_directories(test_pricing PRIVATE
 )
 target_link_libraries(test_pricing PRIVATE m)
 
-# Scenario titles map 1:1 to features/pricing.feature
+# Scenario titles map 1:1 to BDD/features/pricing.feature
 add_test(
     NAME "Retail quote with salesman 5% and trade-in matches invoice 50230"
     COMMAND test_pricing retail_50230
@@ -65,7 +65,7 @@ target_include_directories(test_persistence PRIVATE
 )
 target_link_libraries(test_persistence PRIVATE m)
 
-# Scenario titles map 1:1 to features/persistence.feature
+# Scenario titles map 1:1 to BDD/features/persistence.feature
 # Sample-data scenario needs repo-root CWD so data/ resolves.
 add_test(
     NAME "Load skips comment and empty lines in stock file"
@@ -106,7 +106,7 @@ target_include_directories(test_quote_sell PRIVATE
 )
 target_link_libraries(test_quote_sell PRIVATE m)
 
-# Scenario titles map 1:1 to features/quote_sell.feature
+# Scenario titles map 1:1 to BDD/features/quote_sell.feature
 add_test(
     NAME "Sold vehicle cannot be quoted"
     COMMAND test_quote_sell sold_cannot_quote
@@ -144,7 +144,7 @@ target_include_directories(test_stock PRIVATE
 )
 target_link_libraries(test_stock PRIVATE m)
 
-# Scenario titles map 1:1 to features/stock.feature
+# Scenario titles map 1:1 to BDD/features/stock.feature
 add_test(
     NAME "Adding a vehicle requires plate and positive list price"
     COMMAND test_stock add_requires_plate_price
@@ -190,7 +190,7 @@ target_include_directories(test_customer PRIVATE
 )
 target_link_libraries(test_customer PRIVATE m)
 
-# Scenario titles map 1:1 to features/customers.feature
+# Scenario titles map 1:1 to BDD/features/customers.feature
 add_test(
     NAME "Adding a customer requires a non-empty name"
     COMMAND test_customer add_requires_name
@@ -237,7 +237,7 @@ target_include_directories(test_fleet PRIVATE
 )
 target_link_libraries(test_fleet PRIVATE m)
 
-# Scenario titles map 1:1 to features/fleet.feature
+# Scenario titles map 1:1 to BDD/features/fleet.feature
 add_test(
     NAME "Fleet quote shows 4% off list with no salesman discount"
     COMMAND test_fleet fleet_4pct_no_salesman

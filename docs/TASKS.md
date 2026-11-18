@@ -36,7 +36,7 @@ answer. This board records that choice.
 | Topic | Decision |
 |-------|----------|
 | Order | Harden delivery first, then fleet through that path |
-| BDD | Gherkin in `features/` = **behaviour / acceptance contract** (PO language → what the system must do). Not an “implementation spec”. |
+| BDD | Gherkin in `BDD/features/` = **behaviour / acceptance contract** (PO language → what the system must do). Not an “implementation spec”. |
 | TDD | C tests via CMake/CTest verify those scenarios 1:1 (stable scenario titles ↔ test names). |
 | Gherkin runner | **In scope in Phase 5** (E2E against the real binary + terminal PNG proof). Features stay the acceptance contract; CTest/TDD remains the unit/seam gate. |
 | Trusted quality | **Docker + CTest/TDD** (+ Docker pre-run gate). Phase 5 E2E is additional proof, not a replacement. |
@@ -108,12 +108,12 @@ in Docker.
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
 | P2-0 | [x] | Plain-language pricing in `docs/SYSTEM.md` | Money rules must be readable before BDD/TDD | Expand Pricing with bakery-level steps, `rnd2` in words, salesman 0–15, three worked sample invoices, screen vs saved invoice; docs only |
-| P2-1 | [x] | `features/pricing.feature` | Money is the highest-risk area | Gherkin for retail/trade 10%, salesman clamp 0–15, trade-in, `rnd2`, goldens aligned with sample invoices |
+| P2-1 | [x] | `BDD/features/pricing.feature` | Money is the highest-risk area | Gherkin for retail/trade 10%, salesman clamp 0–15, trade-in, `rnd2`, goldens aligned with sample invoices |
 | P2-2 | [x] | CTest C tests for pricing; green | Executable proof of P2-1 | Unit-test `rnd2` / `calc_quote`; map scenario titles 1:1 |
-| P2-3 | [x] | `features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; CTest `chdir` into private temp tree with its own `data/` (no production `dbfile` change) |
-| P2-4 | [x] | `features/quote_sell.feature` + C tests; green | Quote/sell encode business rules and invoice packing | Sold blocked; confirm/cancel sell; `disc` sum; `fees = 205`; prefer seams, stdin only if required |
-| P2-5 | [x] | `features/stock.feature` + C tests; green | Stock mutations are daily dealer ops | Add/find/price/reserve rules from `main.c` |
-| P2-6 | [x] | `features/customers.feature` + C tests; green | Customer type drives discounts | Add/find; R/T only (no fleet yet) |
+| P2-3 | [x] | `BDD/features/persistence.feature` + C tests; green | Flat files are the DB; regressions break production data | Load skip `#`/empty; round-trip; missing-file defaults; CTest `chdir` into private temp tree with its own `data/` (no production `dbfile` change) |
+| P2-4 | [x] | `BDD/features/quote_sell.feature` + C tests; green | Quote/sell encode business rules and invoice packing | Sold blocked; confirm/cancel sell; `disc` sum; `fees = 205`; prefer seams, stdin only if required |
+| P2-5 | [x] | `BDD/features/stock.feature` + C tests; green | Stock mutations are daily dealer ops | Add/find/price/reserve rules from `main.c` |
+| P2-6 | [x] | `BDD/features/customers.feature` + C tests; green | Customer type drives discounts | Add/find; R/T only (no fleet yet) |
 | P2-7 | [x] | Full baseline suite green inside Docker | Trusted gate input for Phase 3 | `ctest` in-container; restore `data/` after mutating checks |
 
 **Done when:** Baseline acceptance suite is green in Docker and documents
@@ -168,7 +168,7 @@ path built in Phases 1–3 (scenarios → red → green → refactor).
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P4-1 | [x] | Fleet Gherkin + retail/trade regression scenarios | BDD first; lock acceptance language | New `features/` scenarios; keep baseline regressions |
+| P4-1 | [x] | Fleet Gherkin + retail/trade regression scenarios | BDD first; lock acceptance language | New `BDD/features/` scenarios; keep baseline regressions |
 | P4-2 | [x] | Red CTest for fleet scenarios | TDD: fail before production change | Tests compiled/registered; failing for missing fleet behaviour |
 | P4-3 | [x] | Implement fleet mark + 4% line in calc/UI/persistence as required | Smallest change that greens P4-2 | Extend customer type/UX, `calc_quote`, quote/invoice print; document storage call for combined `disc` if needed |
 | P4-4 | [x] | Green full suite in Docker; penny regression; data/invoice checks | Prove part 2 without breaking part 1 | Gate + CTest green; manual smoke; restore `data/` if mutated |
@@ -182,7 +182,7 @@ check; non-fleet totals unchanged to the penny.
 
 **Branch:** `feature/gherkin-e2e-terminal`
 
-**Why this phase exists:** `features/*.feature` are the acceptance contract.
+**Why this phase exists:** `BDD/features/*.feature` are the acceptance contract.
 Phase 5 gives them an operational path: a runner drives the real `dealerdesk`
 binary through UI flows, asserts production behaviour, and captures one PNG per
 happy path as human-visible E2E evidence. CTest/TDD stays the unit/seam gate.
@@ -196,12 +196,12 @@ math (stays CTest); Cucumber beauty contest; changing non-fleet totals.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P5-1 | [ ] | Scaffold E2E runner in Docker (Gherkin → drive `dealerdesk`) | Wire `.feature` steps to the real binary | Behave (or equivalent) + PTY/`pexpect`; isolated temp `data/`; document in `docs/DOCKER.md` |
-| P5-2 | [ ] | E2E assert: mark existing customer as fleet | TICKET-142 / `fleet.feature` via UI | Steps + asserts on stdout/state; production binary, not seam-only |
-| P5-3 | [ ] | PNG for “mark existing as fleet” flow | Human-visible E2E proof (+ optional PNG assert) | Capture after steps; artifact in repo or CI artifacts |
-| P5-4 | [ ] | E2E assert: fleet quote shows “Fleet discount” line and total | Ticket quote acceptance on the terminal | Navigate menus; assert binary text/totals |
-| P5-5 | [ ] | PNG for “fleet quote” flow | Second visual E2E proof | Same capture pipeline as P5-3 |
-| P5-6 | [ ] | make/docker target (+ CI if it fits) for the E2E suite | Repeatable habit; CTest remains trusted unit gate | `make e2e` / compose; fail closed on the chosen path; no staff-visible product change |
+| P5-1 | [x] | Scaffold BDD runner (Gherkin → drive `dealerdesk`) | Wire `.feature` steps to the real binary on host or Docker | C console session + step definitions under `BDD/`; isolated temp `data/`; `BDD/runner/README.md` |
+| P5-2 | [x] | E2E assert: mark existing customer as fleet | TICKET-142 / fleet via UI | `@terminal` feature + steps; assert stdout/state |
+| P5-3 | [x] | PNG for “mark existing as fleet” flow | Human-visible E2E proof | `BDD/artifacts/mark_existing_fleet.png` |
+| P5-4 | [x] | E2E assert: fleet quote shows “Fleet discount” line and total | Ticket quote acceptance on the terminal | `@terminal` feature + steps on production binary |
+| P5-5 | [x] | PNG for “fleet quote” flow | Second visual E2E proof | `BDD/artifacts/fleet_quote.png` |
+| P5-6 | [x] | make/docker target (+ CI if it fits) for the BDD suite | Repeatable habit; CTest remains trusted unit gate | `make bdd` / `make docker-bdd`; fail closed on that path |
 
 **Done when:** Both fleet UI flows are green on production asserts, one PNG
 exists per flow, docs explain how to run the suite, and checkboxes are marked

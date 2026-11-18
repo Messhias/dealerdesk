@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/fleet.feature (fleet discount + mark type F).
+ * CTest coverage for BDD/features/fleet.feature (fleet discount + mark type F).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  */
 #include <stdio.h>

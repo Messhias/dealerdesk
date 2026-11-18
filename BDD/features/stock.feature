@@ -3,7 +3,7 @@ Feature: Stock vehicle mutations
   I need add find price reserve and list rules to stay stable
   So that daily stock ops do not drift from current behaviour
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: docs/SYSTEM.md Vehicles / Stock menus, and main.c stock path.
   # Truth exercised via stock.c seams used by main.c (no stdin). Plate match is exact.
 

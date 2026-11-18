@@ -1,5 +1,5 @@
 /*
- * CTest coverage for features/quote_sell.feature (quote/sell seams).
+ * CTest coverage for BDD/features/quote_sell.feature (quote/sell seams).
  * Scenario titles map 1:1 via CTest NAME + argv dispatch.
  *
  * Confirm = complete_sale + save_*. Cancel = skip complete_sale.
@@ -96,15 +96,17 @@ static int scenario_packs_fees(void)
 static int scenario_confirm_sale(void)
 {
     QUOTE q;
-    int rc;
 
     reset_tables();
+    
     if (enter_temp_data_tree("ddquotesell") != 0)
         return 1;
 
     seed_sale_fixture();
     calc_quote(&q, veh[0].price, cust[0].type, 5.0, 1500.00);
-    rc = complete_sale(&veh[0], &cust[0], &q, "2026-11-17");
+    
+    const int rc = complete_sale(&veh[0], &cust[0], &q, "2026-11-17");
+    
     assert_int("complete_sale rc", rc, 0);
 
     save_invoices();

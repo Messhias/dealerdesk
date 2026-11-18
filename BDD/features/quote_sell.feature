@@ -3,7 +3,7 @@ Feature: Quote and sell vehicle
   I need quote and sell rules to stay stable
   So that sold stock is blocked and invoices pack discounts and fees correctly
 
-  # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
+  # Behaviour contract only. Verified by CTest (unit/seam). Terminal UI flows use @terminal + BDD/runner.
   # Truth: docs/SYSTEM.md Quote / Sell / Screen vs saved invoice, and main.c sell path.
   # Tests prefer sale seams (no stdin). Cancel means the sale is not applied.
 
