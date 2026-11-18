@@ -26,7 +26,9 @@ alwaysApply: true
   banner version in `screen.c`. CD bumps `version.h` with `RELEASE.txt` on
   each master release so tag and in-app banner match.
 - Gherkin under `features/` = behaviour/acceptance contract, not implementation
-  spec. CTest verifies. No Gherkin runner unless explicitly added.
+  spec. CTest verifies unit/seam scenarios. Phase 5 on `docs/TASKS.md` adds an
+  E2E Gherkin runner against the real binary plus terminal PNG proof; it does
+  not replace CTest.
 - SDLC: `docs/SDLC.md`. BDD then TDD are mandatory on every behaviour change.
 - Canonical agent instructions: `AGENTS.md` (shared with Claude, Copilot,
   DeepSeek, and other agents via their entry files).
