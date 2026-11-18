@@ -26,7 +26,7 @@ void invoice_from_quote(INVOICE *i, const QUOTE *q, int inv_no,
     i->veh_id = veh_id;
     i->cust_id = cust_id;
     i->list = q->list;
-    i->disc = q->trade_disc + q->disc;
+    i->disc = q->trade_disc + q->fleet_disc + q->disc;
     i->net = q->net;
     i->vat = q->vat;
     i->fees = q->delivery + q->reg_fee;

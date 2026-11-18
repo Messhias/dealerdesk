@@ -43,6 +43,7 @@ answer. This board records that choice.
 | Staff impact | Apart from intentional fleet behaviour, quotes/invoices stay correct **to the penny**. |
 | Ambiguity | Reasonable call + write it down (JOURNAL / NOTES). |
 | Ornament cuts | No Cucumber runtime, no Docker beauty contest, no Help/README archaeology, no features outside `TICKET-142.md`. |
+| App version | In-app banner version lives only in `version.h` (`DEALERDESK_VERSION`). Do **not** hardcode version literals in `screen.c` or elsewhere. CD bumps `version.h` with `RELEASE.txt` on each master release so tag, Release notes, and binary header match. Manual bump only via an explicit release task. |
 
 ---
 
@@ -166,10 +167,10 @@ path built in Phases 1–3 (scenarios → red → green → refactor).
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P4-1 | [ ] | Fleet Gherkin + retail/trade regression scenarios | BDD first; lock acceptance language | New `features/` scenarios; keep baseline regressions |
-| P4-2 | [ ] | Red CTest for fleet scenarios | TDD: fail before production change | Tests compiled/registered; failing for missing fleet behaviour |
-| P4-3 | [ ] | Implement fleet mark + 4% line in calc/UI/persistence as required | Smallest change that greens P4-2 | Extend customer type/UX, `calc_quote`, quote/invoice print; document storage call for combined `disc` if needed |
-| P4-4 | [ ] | Green full suite in Docker; penny regression; data/invoice checks | Prove part 2 without breaking part 1 | Gate + CTest green; manual smoke; restore `data/` if mutated |
+| P4-1 | [x] | Fleet Gherkin + retail/trade regression scenarios | BDD first; lock acceptance language | New `features/` scenarios; keep baseline regressions |
+| P4-2 | [x] | Red CTest for fleet scenarios | TDD: fail before production change | Tests compiled/registered; failing for missing fleet behaviour |
+| P4-3 | [x] | Implement fleet mark + 4% line in calc/UI/persistence as required | Smallest change that greens P4-2 | Extend customer type/UX, `calc_quote`, quote/invoice print; document storage call for combined `disc` if needed |
+| P4-4 | [x] | Green full suite in Docker; penny regression; data/invoice checks | Prove part 2 without breaking part 1 | Gate + CTest green; manual smoke; restore `data/` if mutated |
 
 **Done when:** Fleet acceptance criteria pass under Docker CTest and manual
 check; non-fleet totals unchanged to the penny.

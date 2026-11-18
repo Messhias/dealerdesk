@@ -219,11 +219,20 @@ static void stock_menu(void)
 
 /* -------------------------------------------------------- CUSTOMERS */
 
+static const char *customer_type_label(const char type)
+{
+    if (type == 'T')
+        return "Trade";
+    if (type == 'F')
+        return "Fleet";
+    return "Retail";
+}
+
 static void print_cust_row(CUSTOMER *c)
 {
     printf("  %-5d %-26.26s %-14s %-28.28s %s\n",
            c->id, c->name, c->phone, c->email,
-           c->type == 'T' ? "Trade" : "Retail");
+           customer_type_label(c->type));
 }
 
 static void list_customers(void)
@@ -244,34 +253,93 @@ static void list_customers(void)
     pause_enter();
 }
 
+static char read_customer_type(const char *prompt)
+{
+    char b[8];
+
+    for (;;) {
+        read_line(prompt, b, sizeof b);
+        if (b[0] == 'R' || b[0] == 'r')
+            return 'R';
+        if (b[0] == 'T' || b[0] == 't')
+            return 'T';
+        if (b[0] == 'F' || b[0] == 'f')
+            return 'F';
+        printf("  Enter R (retail), T (trade), or F (fleet).\n");
+    }
+}
+
 static void add_customer(void)
 {
     char name[48];
     char phone[20];
     char email[64];
-    int trade_yes;
-    int rc;
 
     header("Add Customer");
+    
     if (ncust >= MAX_CUST) {
         printf("  Customer file is full!\n");
         pause_enter();
         return;
     }
+    
     read_line("  Name   : ", name, sizeof name);
     read_line("  Phone  : ", phone, sizeof phone);
     read_line("  Email  : ", email, sizeof email);
-    trade_yes = confirm("  Trade customer (Y/N)? ");
 
-    rc = customer_add(name, phone, email, trade_yes);
+    const char type = read_customer_type("  Type (R/T/F): ");
+
+    const int rc = customer_add(name, phone, email, type);
+    
     if (rc != 0) {
         printf("\n  Name is required.\n");
         pause_enter();
         return;
     }
+    
     save_customers();
     save_ids();
+    
     printf("\n  Customer %d added.\n", cust[ncust - 1].id);
+    
+    pause_enter();
+}
+
+static void set_customer_type(void)
+{
+    int i;
+
+    header("Set Customer Type");
+    
+    const int id = read_int("  Customer ID : ");
+    
+    for (i = 0; i < ncust; i++) {
+        if (cust[i].id == id)
+            break;
+    }
+    
+    if (i >= ncust) {
+        printf("  Customer not found.\n");
+        pause_enter();
+        return;
+    }
+    
+    printf("  Current type: %s\n", customer_type_label(cust[i].type));
+    
+    const char type = read_customer_type("  New type (R/T/F): ");
+    
+    const int rc = customer_set_type(id, type);
+    
+    if (rc != 0) {
+        printf("  Could not update type.\n");
+        pause_enter();
+        return;
+    }
+    
+    save_customers();
+    
+    printf("\n  Customer %d is now %s.\n", id, customer_type_label(type));
+    
     pause_enter();
 }
 
@@ -296,19 +364,23 @@ static void find_customer(void)
 
 static void customer_menu(void)
 {
-    int opt;
-
     for (;;) {
+        
         header("Customers");
+        
         printf("  1. List customers\n");
         printf("  2. Add customer\n");
         printf("  3. Find customer\n");
+        printf("  4. Set customer type\n");
         printf("  0. Back\n\n");
-        opt = read_int("  Option: ");
+
+        const int opt = read_int("  Option: ");
+        
         switch (opt) {
         case 1: list_customers(); break;
         case 2: add_customer(); break;
         case 3: find_customer(); break;
+        case 4: set_customer_type(); break;
         case 0: return;
         default:
             printf("  Invalid option\n");
@@ -352,20 +424,28 @@ static void print_quote(const char *title, QUOTE *q, VEHICLE *v, CUSTOMER *c)
 {
     printf("\n  %s\n", title);
     printf("  ----------------------------------------------\n");
-    printf("  Customer : %s (%s)\n", c->name, c->type == 'T' ? "Trade" : "Retail");
+    printf("  Customer : %s (%s)\n", c->name, customer_type_label(c->type));
     printf("  Vehicle  : %s %s %s\n", v->plate, v->make, v->model);
     printf("  ----------------------------------------------\n");
     printf("  List price               %12.2f\n", q->list);
+    
     if (q->trade_disc > 0)
         printf("  Trade discount           %12.2f\n", -q->trade_disc);
+    
+    if (q->fleet_disc > 0)
+        printf("  Fleet discount           %12.2f\n", -q->fleet_disc);
+    
     if (q->disc > 0)
         printf("  Discount (%4.1f%%)         %12.2f\n", q->disc_pct, -q->disc);
+    
     printf("  Net price                %12.2f\n", q->net);
     printf("  Delivery                 %12.2f\n", q->delivery);
     printf("  VAT 20%%                  %12.2f\n", q->vat);
     printf("  Registration fee         %12.2f\n", q->reg_fee);
+    
     if (q->tradein != 0)
         printf("  Trade-in                 %12.2f\n", -q->tradein);
+    
     printf("  ==============================================\n");
     printf("  TOTAL                    %12.2f\n", q->total);
 }
@@ -511,7 +591,8 @@ static void help_screen(void)
     header("Help");
     printf("  DEALERDESK QUICK HELP\n\n");
     printf("  - Plates are converted to upper case automatically.\n");
-    printf("  - Trade customers receive a 5%% trade discount.\n");
+    printf("  - Trade customers receive a 10%% trade discount.\n");
+    printf("  - Fleet customers receive a 4%% fleet discount on the vehicle.\n");
     printf("  - Salesman discounts above 10%% require a manager PIN.\n");
     printf("  - Quotes are valid for 7 days.\n");
     printf("  - A sold vehicle cannot be reserved or sold again.\n");

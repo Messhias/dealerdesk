@@ -37,7 +37,7 @@ static void seed_one_customer(int id, const char *name, char type)
 static int scenario_add_requires_name(void)
 {
     reset_tables();
-    const int rc = customer_add("", "07700 900123", "sarah@example.com", 0);
+    const int rc = customer_add("", "07700 900123", "sarah@example.com", 'R');
     assert_int("empty name rc", rc, -1);
     assert_int("ncust after empty name", ncust, 0);
     return test_failed();
@@ -51,7 +51,7 @@ static int scenario_valid_add_retail(void)
 
     next_cust_id = 2101;
     const int rc = customer_add("Sarah Whitfield", "07700 900123",
-                                "sarah@example.com", 0);
+                                "sarah@example.com", 'R');
     assert_int("customer_add rc", rc, 0);
     assert_int("ncust", ncust, 1);
     assert_int("cust id", cust[0].id, 2101);
@@ -83,7 +83,7 @@ static int scenario_valid_add_trade(void)
 
     next_cust_id = 2105;
     const int rc = customer_add("Fleet Motors Ltd", "01234 567890",
-                                "trade@example.com", 1);
+                                "trade@example.com", 'T');
     assert_int("customer_add rc", rc, 0);
     assert_int("cust id", cust[0].id, 2105);
     assert_char("cust type", cust[0].type, 'T');
@@ -103,21 +103,23 @@ static int scenario_valid_add_trade(void)
 
 static int scenario_add_full_table(void)
 {
-    int i;
-
     reset_tables();
     ncust = MAX_CUST;
-    for (i = 0; i < MAX_CUST; i++) {
+    
+    for (int i = 0; i < MAX_CUST; i++) {
         cust[i].id = 2000 + i;
         snprintf(cust[i].name, sizeof cust[i].name, "Cust %d", i);
         cust[i].type = 'R';
     }
+    
     next_cust_id = 2999;
 
-    const int rc = customer_add("Overflow Test", "1", "o@example.com", 0);
+    const int rc = customer_add("Overflow Test", "1", "o@example.com", 'R');
+    
     assert_int("full table rc", rc, -1);
     assert_int("ncust unchanged", ncust, MAX_CUST);
     assert_int("next_cust_id unchanged", next_cust_id, 2999);
+    
     return test_failed();
 }
 

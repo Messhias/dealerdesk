@@ -1,9 +1,12 @@
 This standard disclaimer states that the work is entirely fictional and any resemblance to real people, places, or events is coincidental.
 
-DEALERDESK v2.1
+DEALERDESK v2.6
 ===============
 
 Dealer management for the showroom: stock, customers, quotes and invoices.
+
+In-app banner version comes from `version.h` (`DEALERDESK_VERSION`). CD keeps
+that file aligned with each GitHub Release tag.
 
 
 QUICK START (Linux, macOS, or WSL on Windows)

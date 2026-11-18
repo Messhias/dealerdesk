@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Update RELEASE.txt Last release line and Modern release history.
+# Update RELEASE.txt Last release line and Modern release history, and bump
+# version.h so the in-app banner matches the GitHub Release tag.
 # Usage: update-release-txt.sh <version> <notes-file>
 #   version: v2.5 or 2.5
 #   notes-file: markdown/text used for the history entry and GitHub Release
@@ -17,6 +18,7 @@ DATE="$(date -u +%Y-%m-%d)"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RELEASE_TXT="${ROOT}/RELEASE.txt"
+VERSION_H="${ROOT}/version.h"
 
 if [[ ! -f "${RELEASE_TXT}" ]]; then
     echo "missing ${RELEASE_TXT}" >&2
@@ -24,6 +26,14 @@ if [[ ! -f "${RELEASE_TXT}" ]]; then
 fi
 if [[ ! -f "${NOTES_FILE}" ]]; then
     echo "missing notes file ${NOTES_FILE}" >&2
+    exit 1
+fi
+if [[ ! -f "${VERSION_H}" ]]; then
+    echo "missing ${VERSION_H}" >&2
+    exit 1
+fi
+if ! grep -q '^#define DEALERDESK_VERSION "' "${VERSION_H}"; then
+    echo "missing #define DEALERDESK_VERSION in ${VERSION_H}" >&2
     exit 1
 fi
 
@@ -91,4 +101,16 @@ awk -v entry_file="${entry_file}" '
 ' "${tmp}" > "${RELEASE_TXT}"
 
 rm -f "${entry_file}"
-echo "Updated ${RELEASE_TXT} for ${VERSION_RAW}"
+
+# Keep in-app banner aligned with this release (same version string, no "v").
+tmp_ver="$(mktemp)"
+awk -v ver="${VERSION}" '
+  /^#define DEALERDESK_VERSION "/ {
+    print "#define DEALERDESK_VERSION \"" ver "\""
+    next
+  }
+  { print }
+' "${VERSION_H}" > "${tmp_ver}"
+mv "${tmp_ver}" "${VERSION_H}"
+
+echo "Updated ${RELEASE_TXT} and ${VERSION_H} for ${VERSION_RAW}"

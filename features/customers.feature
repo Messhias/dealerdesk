@@ -6,7 +6,7 @@ Feature: Customer add find and list
   # Behaviour contract only. Verified later by CTest (no Gherkin runner yet).
   # Truth: docs/SYSTEM.md Customers, and main.c customer path.
   # Truth exercised via customer.c seams used by main.c (no stdin).
-  # Types R and T only; fleet is out of scope for baseline.
+  # Baseline R and T add/find/list. Fleet add/mark lives in features/fleet.feature.
 
   Scenario: Adding a customer requires a non-empty name
     Given an empty customer table

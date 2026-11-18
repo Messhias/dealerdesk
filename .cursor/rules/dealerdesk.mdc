@@ -22,6 +22,9 @@ alwaysApply: true
 - Trusted quality: Docker + CTest/TDD (+ Docker pre-run gate). Multi-OS GitHub
   Release binaries are CI/CD demo only: no sanity suite on those artifacts;
   out-of-Docker use is user discretion.
+- App version: only in `version.h` (`DEALERDESK_VERSION`). Never hardcode the
+  banner version in `screen.c`. CD bumps `version.h` with `RELEASE.txt` on
+  each master release so tag and in-app banner match.
 - Gherkin under `features/` = behaviour/acceptance contract, not implementation
   spec. CTest verifies. No Gherkin runner unless explicitly added.
 - SDLC: `docs/SDLC.md`. BDD then TDD are mandatory on every behaviour change.
