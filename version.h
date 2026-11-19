@@ -7,6 +7,6 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define DEALERDESK_VERSION "2.10"
+#define DEALERDESK_VERSION "2.11"
 
 #endif
