@@ -1,7 +1,8 @@
 # DealerDesk — Docker build and test
 
 Trusted quality path: compile and run CTest inside Docker. The image pins a
-Debian userland with `build-essential` (gcc) and `cmake`/`ctest`, matching the
+Debian userland with `build-essential` (gcc), `cmake`/`ctest`, and
+`zlib1g-dev` (PNG screenshots for the Unix BDD runner), matching the
 challenge one-liner `gcc -o dealerdesk *.c -lm` plus our CMake entrypoint.
 
 Host CMake (without Docker) is also supported from the repository root via the
@@ -13,9 +14,11 @@ Multi-OS GitHub Release binaries (when present) are a CI/CD demo only. They are
 not a second quality gate.
 
 GitHub Actions CI (`.github/workflows/ci.yml`) uses `debian:bookworm-slim`,
-the same base OS as this repo’s Dockerfile, and runs CMake/CTest on every
-pull request to `master` (no re-run on merge push; no docker compose in CI).
-Local trusted runs remain `make docker-test` / the pre-run gate.
+the same base OS as this repo’s Dockerfile, installs the same toolchain
+packages (`build-essential`, `cmake`, `zlib1g-dev`) plus `git` /
+`ca-certificates` for checkout, and runs CMake/CTest on every pull request
+to `master` (no re-run on merge push; no docker compose in CI). Local
+trusted runs remain `make docker-test` / the pre-run gate.
 
 GitHub Actions CD (`.github/workflows/cd-release.yml`) is a **delivery demo
 only**: on push to `master` it may create the next `v2.N` tag, update

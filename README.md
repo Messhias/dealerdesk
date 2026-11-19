@@ -96,7 +96,7 @@ Prerequisites
 * Always run commands from the repository root (`data/` is relative).
 * Host path: a C compiler plus CMake on PATH.
   - macOS (Homebrew): `brew install cmake`
-  - Debian/Ubuntu: `sudo apt-get install -y build-essential cmake`
+  - Debian/Ubuntu: `sudo apt-get install -y build-essential cmake zlib1g-dev`
 * Docker path: Docker Desktop (or Engine) + Compose v2. No host cmake needed.
 
 Option A — host (Makefile wrappers)
