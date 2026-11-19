@@ -51,3 +51,4 @@ Use short ISO dates (`YYYY-MM-DD`). SHA may be abbreviated (`git rev-parse --sho
 | 2026-11-18 | P5 | P5-1..P5-6 | 2c7d362 | BDD/ tree (features+runner+steps); @terminal fleet flows; PNGs; make bdd/docker-bdd; host/Docker binary split |
 | 2026-11-18 | P5 | P5-7..P5-10 | 52ff510 | All existing scenarios @terminal; per-feature steps; CMake bdd_runner; PNGs under artifacts/<feature>/; board aligned |
 | 2026-11-19 | P6 | P6-1 | 113310b | NOTES.md ≤2 pages: priorities, agent miss, assumptions, next |
+| 2026-11-19 | P6 | P6-2 | pending-sha | Agent setup in-repo; JOURNAL complete; origin Messhias/dealerdesk only; TASKS P6 done |
