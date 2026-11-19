@@ -234,8 +234,8 @@ agent setup, and a short NOTES file. This remains the **last** phase.
 
 | ID | Status | What | Why | How (when executing) |
 |----|--------|------|-----|----------------------|
-| P6-1 | [ ] | Write `NOTES.md` (≤2 pages) | Challenge requires it | Use JOURNAL + git history: what/why priority, one agent miss + how caught, assumptions, next with more time |
-| P6-2 | [ ] | Confirm agent setup + todo↔SHA completeness; no upstream PR | Submission shape | Check rules/skills/scripts/workflows in repo; JOURNAL complete; own remote only |
+| P6-1 | [x] | Write `NOTES.md` (≤2 pages) | Challenge requires it | Use JOURNAL + git history: what/why priority, one agent miss + how caught, assumptions, next with more time |
+| P6-2 | [x] | Confirm agent setup + todo↔SHA completeness; no upstream PR | Submission shape | Check rules/skills/scripts/workflows in repo; JOURNAL complete; own remote only |
 
 **Done when:** `NOTES.md` exists, setup is in-repo, history tells the story,
 nothing was PRed to `felipeamarante/dealerdesk`.
