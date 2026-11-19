@@ -21,6 +21,7 @@ jobs:
           apt-get install -y --no-install-recommends \
             build-essential \
             cmake \
+            zlib1g-dev \
             ca-certificates \
             git
           rm -rf /var/lib/apt/lists/*
