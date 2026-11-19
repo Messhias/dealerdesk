@@ -4,8 +4,6 @@
 #ifndef TEST_COMMON_H
 #define TEST_COMMON_H
 
-#include "globals.h"
-
 #define MONEY_EPS 0.001
 
 extern int g_failures;

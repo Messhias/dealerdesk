@@ -20,9 +20,8 @@ void header(const char *title)
     printf("==============================================================\n\n");
 }
 
-void read_line(const char *prompt, char *buf, int len)
+void read_line(const char *prompt, char *buf, const int len)
 {
-    char *p;
     int c;
 
     printf("%s", prompt);
@@ -31,7 +30,9 @@ void read_line(const char *prompt, char *buf, int len)
         printf("\n");
         exit(0);
     }
-    p = strchr(buf, '\n');
+    
+    char* p = strchr(buf, '\n');
+    
     if (p)
         *p = 0;
     else
@@ -46,7 +47,9 @@ void read_line(const char *prompt, char *buf, int len)
 int read_int(const char *prompt)
 {
     char b[32];
+    
     read_line(prompt, b, sizeof b);
+    
     return atoi(b);
 }
 

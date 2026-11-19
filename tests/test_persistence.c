@@ -189,7 +189,7 @@ static const scenario_entry SCENARIOS[] = {
     {"sample_repo_data", scenario_sample_repo_data},
 };
 
-int main(int argc, char **argv)
+int main(const int argc, char **argv)
 {
     size_t i;
     int failed = 0;

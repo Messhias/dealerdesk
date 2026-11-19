@@ -10,6 +10,8 @@
 
 #include "test_common.h"
 
+#include "globals.h"
+
 int g_failures;
 static char g_home_cwd[512];
 static char g_temp_root[256];
@@ -24,7 +26,7 @@ int test_failed(void)
     return g_failures != 0;
 }
 
-void assert_int(const char *label, int got, int want)
+void assert_int(const char *label, const int got, const int want)
 {
     if (got != want) {
         fprintf(stderr, "FAIL %s: got %d want %d\n", label, got, want);
@@ -32,7 +34,7 @@ void assert_int(const char *label, int got, int want)
     }
 }
 
-void assert_money(const char *label, double got, double want)
+void assert_money(const char *label, const double got, const double want)
 {
     if (fabs(got - want) > MONEY_EPS) {
         fprintf(stderr, "FAIL %s: got %.4f want %.2f\n", label, got, want);
@@ -40,7 +42,7 @@ void assert_money(const char *label, double got, double want)
     }
 }
 
-void assert_true(const char *label, int cond)
+void assert_true(const char *label, const int cond)
 {
     if (!cond) {
         fprintf(stderr, "FAIL %s: expected true\n", label);
@@ -48,7 +50,7 @@ void assert_true(const char *label, int cond)
     }
 }
 
-void assert_false(const char *label, int cond)
+void assert_false(const char *label, const int cond)
 {
     if (cond) {
         fprintf(stderr, "FAIL %s: expected false\n", label);
@@ -56,7 +58,7 @@ void assert_false(const char *label, int cond)
     }
 }
 
-void assert_char(const char *label, char got, char want)
+void assert_char(const char *label, const char got, const char want)
 {
     if (got != want) {
         fprintf(stderr, "FAIL %s: got '%c' want '%c'\n", label, got, want);

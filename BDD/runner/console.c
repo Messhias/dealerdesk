@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -33,12 +32,11 @@ static int path_is_file(const char *path)
     return path && stat(path, &st) == 0 && S_ISREG(st.st_mode);
 }
 
-int console_resolve_binary(char *buf, size_t buflen)
+int console_resolve_binary(char *buf, const size_t buflen)
 {
     const char *env = getenv("DEALERDESK_BIN");
     const char *candidates[4];
     int n = 0;
-    int i;
 
     if (!buf || buflen < 8)
         return -1;
@@ -60,7 +58,7 @@ int console_resolve_binary(char *buf, size_t buflen)
         candidates[n++] = "build-docker/dealerdesk";
     }
 
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         if (path_is_file(candidates[i])) {
             snprintf(buf, buflen, "%s", candidates[i]);
             return 0;
@@ -75,15 +73,13 @@ int console_resolve_binary(char *buf, size_t buflen)
 
 static int copy_file(const char *src, const char *dst)
 {
-    FILE *in;
-    FILE *out;
     char block[4096];
     size_t n;
 
-    in = fopen(src, "rb");
+    FILE* in = fopen(src, "rb");
     if (!in)
         return -1;
-    out = fopen(dst, "wb");
+    FILE* out = fopen(dst, "wb");
     if (!out) {
         fclose(in);
         return -1;
@@ -100,19 +96,17 @@ static int copy_file(const char *src, const char *dst)
     return 0;
 }
 
-int console_prepare_workdir(char *workdir, size_t buflen, const char *repo_root)
+int console_prepare_workdir(char *workdir, const size_t buflen, const char *repo_root)
 {
     char tmpl[] = "/tmp/ddbddXXXXXX";
-    char *root;
     char src[768];
     char dst[768];
     char data_dir[600];
     static const char *files[] = {
         "stock.dat", "customers.dat", "invoices.dat", "next_ids.dat", NULL
     };
-    int i;
 
-    root = mkdtemp(tmpl);
+    char* root = mkdtemp(tmpl);
     if (!root)
         return -1;
 
@@ -121,7 +115,7 @@ int console_prepare_workdir(char *workdir, size_t buflen, const char *repo_root)
     if (mkdir(data_dir, 0700) != 0)
         return -1;
 
-    for (i = 0; files[i]; i++) {
+    for (int i = 0; files[i]; i++) {
         snprintf(src, sizeof src, "%s/data/%s", repo_root, files[i]);
         snprintf(dst, sizeof dst, "%s/data/%s", workdir, files[i]);
         if (copy_file(src, dst) != 0) {
@@ -132,13 +126,12 @@ int console_prepare_workdir(char *workdir, size_t buflen, const char *repo_root)
     return 0;
 }
 
-int console_prepare_empty_workdir(char *workdir, size_t buflen)
+int console_prepare_empty_workdir(char *workdir, const size_t buflen)
 {
     char tmpl[] = "/tmp/ddbddXXXXXX";
-    char *root;
     char data_dir[600];
 
-    root = mkdtemp(tmpl);
+    char* root = mkdtemp(tmpl);
     if (!root)
         return -1;
 
@@ -217,9 +210,8 @@ void console_stop(Console *c)
 
     if (c->pid > 0) {
         int status = 0;
-        int i;
-        for (i = 0; i < 20; i++) {
-            pid_t r = waitpid(c->pid, &status, WNOHANG);
+        for (int i = 0; i < 20; i++) {
+            const pid_t r = waitpid(c->pid, &status, WNOHANG);
             if (r == c->pid || (r < 0 && errno == ECHILD))
                 break;
             usleep(50000);
@@ -236,8 +228,7 @@ void console_stop(Console *c)
         static const char *files[] = {
             "stock.dat", "customers.dat", "invoices.dat", "next_ids.dat", NULL
         };
-        int i;
-        for (i = 0; files[i]; i++) {
+        for (int i = 0; files[i]; i++) {
             snprintf(path, sizeof path, "%s/data/%s", c->workdir, files[i]);
             unlink(path);
         }
@@ -267,9 +258,8 @@ int console_saw_from(const Console *c, size_t from, const char *needle)
 static int append_read(Console *c)
 {
     char buf[2048];
-    ssize_t n;
 
-    n = read(c->master_fd, buf, sizeof buf);
+    ssize_t n = read(c->master_fd, buf, sizeof buf);
     if (n < 0) {
         if (errno == EAGAIN || errno == EINTR)
             return 0;
@@ -287,7 +277,7 @@ static int append_read(Console *c)
     return 1;
 }
 
-int console_expect(Console *c, const char *needle, int timeout_ms)
+int console_expect(Console *c, const char *needle, const int timeout_ms)
 {
     int elapsed = 0;
 
@@ -342,15 +332,13 @@ int console_expect(Console *c, const char *needle, int timeout_ms)
 int console_sendline(Console *c, const char *line)
 {
     char buf[512];
-    size_t len;
-    ssize_t n;
 
     if (!c || c->master_fd < 0 || !line)
         return -1;
 
     snprintf(buf, sizeof buf, "%s\n", line);
-    len = strlen(buf);
-    n = write(c->master_fd, buf, len);
+    const size_t len = strlen(buf);
+    const ssize_t n = write(c->master_fd, buf, len);
     if (n < 0 || (size_t)n != len)
         return -1;
     return 0;

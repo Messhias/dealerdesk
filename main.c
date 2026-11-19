@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <time.h>
 #include "globals.h"
 #include "screen.h"
@@ -18,18 +17,18 @@
 #include "stock.h"
 #include "customer.h"
 
-VEHICLE  veh[MAX_VEH];
-int      nveh = 0;
+VEHICLE veh[MAX_VEH];
+int nveh = 0;
 CUSTOMER cust[MAX_CUST];
-int      ncust = 0;
-INVOICE  inv[MAX_INV];
-int      ninv = 0;
+int ncust = 0;
+INVOICE inv[MAX_INV];
+int ninv = 0;
 
-int next_veh_id  = 1000;
+int next_veh_id = 1000;
 int next_cust_id = 2000;
-int next_inv_no  = 50000;
+int next_inv_no = 50000;
 
-static const char *status_txt(int s)
+static const char* status_txt(const int s)
 {
     if (s == ST_STOCK)
         return "IN STOCK";
@@ -40,19 +39,17 @@ static const char *status_txt(int s)
     return "?";
 }
 
-static VEHICLE *find_veh(int id)
+static VEHICLE* find_veh(const int id)
 {
-    int i;
-    for (i = 0; i < nveh; i++)
+    for (int i = 0; i < nveh; i++)
         if (veh[i].id == id)
             return &veh[i];
     return NULL;
 }
 
-static CUSTOMER *find_cust(int id)
+static CUSTOMER* find_cust(const int id)
 {
-    int i;
-    for (i = 0; i < ncust; i++)
+    for (int i = 0; i < ncust; i++)
         if (cust[i].id == id)
             return &cust[i];
     return NULL;
@@ -60,15 +57,18 @@ static CUSTOMER *find_cust(int id)
 
 /* ------------------------------------------------------------ STOCK */
 
-static void list_stock(int show_sold)
+static void list_stock(const int show_sold)
 {
-    int i, n = 0;
+    int n = 0;
 
     header(show_sold ? "All Vehicles" : "Stock List");
+
     printf("  %-5s %-10s %-12s %-22s %4s %8s %10s  %s\n",
            "ID", "PLATE", "MAKE", "MODEL", "YEAR", "MILES", "PRICE", "STATUS");
     printf("  ----------------------------------------------------------------------------------\n");
-    for (i = 0; i < nveh; i++) {
+
+    for (int i = 0; i < nveh; i++)
+    {
         if (!stock_visible_in_list(&veh[i], show_sold))
             continue;
         printf("  %-5d %-10s %-12s %-22.22s %4d %8ld %10.2f  %s\n",
@@ -77,7 +77,9 @@ static void list_stock(int show_sold)
                status_txt(veh[i].status));
         n++;
     }
+
     printf("\n  %d vehicle(s)\n", n);
+
     pause_enter();
 }
 
@@ -89,17 +91,20 @@ static void add_vehicle(void)
     char b[32];
 
     header("Add Vehicle");
-    if (nveh >= MAX_VEH) {
+
+    if (nveh >= MAX_VEH)
+    {
         printf("  Stock file is full!\n");
         pause_enter();
         return;
     }
+
     read_line("  Plate      : ", plate, sizeof plate);
     read_line("  Make       : ", make, sizeof make);
     read_line("  Model      : ", model, sizeof model);
 
     const int year = read_int("  Year       : ");
-    
+
     read_line("  Mileage    : ", b, sizeof b);
 
     const long mileage = atol(b);
@@ -107,16 +112,19 @@ static void add_vehicle(void)
     const double price = read_money("  List price : ");
 
     const int rc = stock_add(plate, make, model, year, mileage, cost, price);
-    
-    if (rc != 0) {
+
+    if (rc != 0)
+    {
         printf("\n  Plate and list price are required.\n");
         pause_enter();
         return;
     }
+
     save_stock();
     save_ids();
+
     printf("\n  Vehicle %d added.\n", veh[nveh - 1].id);
-    
+
     pause_enter();
 }
 
@@ -126,73 +134,86 @@ static void find_plate(void)
 
     header("Find Vehicle");
     read_line("  Plate : ", b, sizeof b);
-    
-    if (stock_find_first_by_plate(b) < 0) {
+
+    if (stock_find_first_by_plate(b) < 0)
+    {
         printf("\n  No vehicle with plate %s\n", b);
         pause_enter();
         return;
     }
-    
-    for (int i = 0; i < nveh; i++) {
+
+    for (int i = 0; i < nveh; i++)
+    {
         if (strcmp(veh[i].plate, b) != 0)
             continue;
+
         printf("\n  ID       : %d\n", veh[i].id);
         printf("  Vehicle  : %s %s (%d)\n", veh[i].make, veh[i].model, veh[i].year);
         printf("  Mileage  : %ld\n", veh[i].mileage);
         printf("  Price    : %.2f\n", veh[i].price);
         printf("  Status   : %s\n", status_txt(veh[i].status));
     }
-    
+
     pause_enter();
 }
 
 static void change_price(void)
 {
     header("Change Price");
+
     VEHICLE* v = find_veh(read_int("  Vehicle ID : "));
-    
-    if (!v) {
+
+    if (!v)
+    {
         printf("\n  Vehicle not found.\n");
         pause_enter();
         return;
     }
-    
+
     printf("  %s %s %s, current price %.2f\n", v->plate, v->make, v->model, v->price);
 
     const double p = read_money("  New price  : ");
-    
-    if (stock_set_price(v, p)) {
+
+    if (stock_set_price(v, p))
+    {
         save_stock();
         printf("\n  Price updated.\n");
-    } else {
+    }
+    else
+    {
         printf("\n  Price not changed.\n");
     }
-    
+
     pause_enter();
 }
 
 static void reserve_vehicle(void)
 {
     header("Reserve / Release");
+
     VEHICLE* v = find_veh(read_int("  Vehicle ID : "));
-    
-    if (!v) {
+
+    if (!v)
+    {
         printf("\n  Vehicle not found.\n");
-    } else if (stock_toggle_reserve(v) != 0) {
+    }
+    else if (stock_toggle_reserve(v) != 0)
+    {
         printf("\n  Vehicle is already sold.\n");
-    } else {
+    }
+    else
+    {
         save_stock();
         printf("\n  Vehicle %d is now %s.\n", v->id, status_txt(v->status));
     }
-    
+
     pause_enter();
 }
 
 static void stock_menu(void)
 {
-    int opt;
-
-    for (;;) {
+    for (;;)
+    {
         header("Stock");
         printf("  1. List stock\n");
         printf("  2. List all vehicles (incl. sold)\n");
@@ -201,14 +222,21 @@ static void stock_menu(void)
         printf("  5. Change price\n");
         printf("  6. Reserve / release vehicle\n");
         printf("  0. Back\n\n");
-        opt = read_int("  Option: ");
-        switch (opt) {
-        case 1: list_stock(0); break;
-        case 2: list_stock(1); break;
-        case 3: add_vehicle(); break;
-        case 4: find_plate(); break;
-        case 5: change_price(); break;
-        case 6: reserve_vehicle(); break;
+        const int opt = read_int("  Option: ");
+        switch (opt)
+        {
+        case 1: list_stock(0);
+            break;
+        case 2: list_stock(1);
+            break;
+        case 3: add_vehicle();
+            break;
+        case 4: find_plate();
+            break;
+        case 5: change_price();
+            break;
+        case 6: reserve_vehicle();
+            break;
         case 0: return;
         default:
             printf("  Invalid option\n");
@@ -219,7 +247,7 @@ static void stock_menu(void)
 
 /* -------------------------------------------------------- CUSTOMERS */
 
-static const char *customer_type_label(const char type)
+static const char* customer_type_label(const char type)
 {
     if (type == 'T')
         return "Trade";
@@ -228,7 +256,7 @@ static const char *customer_type_label(const char type)
     return "Retail";
 }
 
-static void print_cust_row(CUSTOMER *c)
+static void print_cust_row(CUSTOMER* c)
 {
     printf("  %-5d %-26.26s %-14s %-28.28s %s\n",
            c->id, c->name, c->phone, c->email,
@@ -237,13 +265,13 @@ static void print_cust_row(CUSTOMER *c)
 
 static void list_customers(void)
 {
-    int i;
     int n = 0;
 
     header("Customers");
     printf("  %-5s %-26s %-14s %-28s %s\n", "ID", "NAME", "PHONE", "EMAIL", "TYPE");
     printf("  -----------------------------------------------------------------------------------\n");
-    for (i = 0; i < ncust; i++) {
+    for (int i = 0; i < ncust; i++)
+    {
         if (!customer_visible_in_list(&cust[i]))
             continue;
         print_cust_row(&cust[i]);
@@ -253,11 +281,12 @@ static void list_customers(void)
     pause_enter();
 }
 
-static char read_customer_type(const char *prompt)
+static char read_customer_type(const char* prompt)
 {
     char b[8];
 
-    for (;;) {
+    for (;;)
+    {
         read_line(prompt, b, sizeof b);
         if (b[0] == 'R' || b[0] == 'r')
             return 'R';
@@ -276,13 +305,14 @@ static void add_customer(void)
     char email[64];
 
     header("Add Customer");
-    
-    if (ncust >= MAX_CUST) {
+
+    if (ncust >= MAX_CUST)
+    {
         printf("  Customer file is full!\n");
         pause_enter();
         return;
     }
-    
+
     read_line("  Name   : ", name, sizeof name);
     read_line("  Phone  : ", phone, sizeof phone);
     read_line("  Email  : ", email, sizeof email);
@@ -290,18 +320,19 @@ static void add_customer(void)
     const char type = read_customer_type("  Type (R/T/F): ");
 
     const int rc = customer_add(name, phone, email, type);
-    
-    if (rc != 0) {
+
+    if (rc != 0)
+    {
         printf("\n  Name is required.\n");
         pause_enter();
         return;
     }
-    
+
     save_customers();
     save_ids();
-    
+
     printf("\n  Customer %d added.\n", cust[ncust - 1].id);
-    
+
     pause_enter();
 }
 
@@ -310,49 +341,52 @@ static void set_customer_type(void)
     int i;
 
     header("Set Customer Type");
-    
+
     const int id = read_int("  Customer ID : ");
-    
-    for (i = 0; i < ncust; i++) {
+
+    for (i = 0; i < ncust; i++)
+    {
         if (cust[i].id == id)
             break;
     }
-    
-    if (i >= ncust) {
+
+    if (i >= ncust)
+    {
         printf("  Customer not found.\n");
         pause_enter();
         return;
     }
-    
+
     printf("  Current type: %s\n", customer_type_label(cust[i].type));
-    
+
     const char type = read_customer_type("  New type (R/T/F): ");
-    
+
     const int rc = customer_set_type(id, type);
-    
-    if (rc != 0) {
+
+    if (rc != 0)
+    {
         printf("  Could not update type.\n");
         pause_enter();
         return;
     }
-    
+
     save_customers();
-    
+
     printf("\n  Customer %d is now %s.\n", id, customer_type_label(type));
-    
+
     pause_enter();
 }
 
 static void find_customer(void)
 {
     char b[48];
-    int i;
     int n = 0;
 
     header("Find Customer");
     read_line("  Name contains : ", b, sizeof b);
     printf("\n");
-    for (i = 0; i < ncust; i++) {
+    for (int i = 0; i < ncust; i++)
+    {
         if (!customer_name_matches(&cust[i], b))
             continue;
         print_cust_row(&cust[i]);
@@ -364,10 +398,10 @@ static void find_customer(void)
 
 static void customer_menu(void)
 {
-    for (;;) {
-        
+    for (;;)
+    {
         header("Customers");
-        
+
         printf("  1. List customers\n");
         printf("  2. Add customer\n");
         printf("  3. Find customer\n");
@@ -375,12 +409,17 @@ static void customer_menu(void)
         printf("  0. Back\n\n");
 
         const int opt = read_int("  Option: ");
-        
-        switch (opt) {
-        case 1: list_customers(); break;
-        case 2: add_customer(); break;
-        case 3: find_customer(); break;
-        case 4: set_customer_type(); break;
+
+        switch (opt)
+        {
+        case 1: list_customers();
+            break;
+        case 2: add_customer();
+            break;
+        case 3: find_customer();
+            break;
+        case 4: set_customer_type();
+            break;
         case 0: return;
         default:
             printf("  Invalid option\n");
@@ -391,28 +430,27 @@ static void customer_menu(void)
 
 /* ----------------------------------------------------------- QUOTES */
 
-static int build_quote(QUOTE *q, VEHICLE **pv, CUSTOMER **pc)
+static int build_quote(QUOTE* q, VEHICLE** pv, CUSTOMER** pc)
 {
-    VEHICLE *v;
-    CUSTOMER *c;
-    double pct, ti;
-
-    v = find_veh(read_int("  Vehicle ID  : "));
-    if (!v) {
+    VEHICLE* v = find_veh(read_int("  Vehicle ID  : "));
+    if (!v)
+    {
         printf("\n  Vehicle not found.\n");
         return 0;
     }
-    if (!vehicle_can_quote(v)) {
+    if (!vehicle_can_quote(v))
+    {
         printf("\n  Vehicle is already sold.\n");
         return 0;
     }
-    c = find_cust(read_int("  Customer ID : "));
-    if (!c) {
+    CUSTOMER* c = find_cust(read_int("  Customer ID : "));
+    if (!c)
+    {
         printf("\n  Customer not found.\n");
         return 0;
     }
-    pct = read_money("  Discount %  : ");
-    ti = read_money("  Trade-in    : ");
+    const double pct = read_money("  Discount %  : ");
+    const double ti = read_money("  Trade-in    : ");
 
     calc_quote(q, v->price, c->type, pct, ti);
     *pv = v;
@@ -420,7 +458,7 @@ static int build_quote(QUOTE *q, VEHICLE **pv, CUSTOMER **pc)
     return 1;
 }
 
-static void print_quote(const char *title, QUOTE *q, VEHICLE *v, CUSTOMER *c)
+static void print_quote(const char* title, const QUOTE* q, VEHICLE* v, CUSTOMER* c)
 {
     printf("\n  %s\n", title);
     printf("  ----------------------------------------------\n");
@@ -428,24 +466,24 @@ static void print_quote(const char *title, QUOTE *q, VEHICLE *v, CUSTOMER *c)
     printf("  Vehicle  : %s %s %s\n", v->plate, v->make, v->model);
     printf("  ----------------------------------------------\n");
     printf("  List price               %12.2f\n", q->list);
-    
+
     if (q->trade_disc > 0)
         printf("  Trade discount           %12.2f\n", -q->trade_disc);
-    
+
     if (q->fleet_disc > 0)
         printf("  Fleet discount           %12.2f\n", -q->fleet_disc);
-    
+
     if (q->disc > 0)
         printf("  Discount (%4.1f%%)         %12.2f\n", q->disc_pct, -q->disc);
-    
+
     printf("  Net price                %12.2f\n", q->net);
     printf("  Delivery                 %12.2f\n", q->delivery);
     printf("  VAT 20%%                  %12.2f\n", q->vat);
     printf("  Registration fee         %12.2f\n", q->reg_fee);
-    
+
     if (q->tradein != 0)
         printf("  Trade-in                 %12.2f\n", -q->tradein);
-    
+
     printf("  ==============================================\n");
     printf("  TOTAL                    %12.2f\n", q->total);
 }
@@ -453,11 +491,12 @@ static void print_quote(const char *title, QUOTE *q, VEHICLE *v, CUSTOMER *c)
 static void quote_screen(void)
 {
     QUOTE q;
-    VEHICLE *v;
-    CUSTOMER *c;
+    VEHICLE* v;
+    CUSTOMER* c;
 
     header("Quote");
-    if (build_quote(&q, &v, &c)) {
+    if (build_quote(&q, &v, &c))
+    {
         print_quote("QUOTATION (valid 7 days)", &q, v, c);
     }
     pause_enter();
@@ -466,23 +505,26 @@ static void quote_screen(void)
 static void sell_vehicle(void)
 {
     QUOTE q;
-    VEHICLE *v;
-    CUSTOMER *c;
-    INVOICE *i;
+    VEHICLE* v;
+    CUSTOMER* c;
+    INVOICE* i;
     time_t now;
 
     header("Sell Vehicle");
-    if (ninv >= MAX_INV) {
+    if (ninv >= MAX_INV)
+    {
         printf("  Invoice file is full!\n");
         pause_enter();
         return;
     }
-    if (!build_quote(&q, &v, &c)) {
+    if (!build_quote(&q, &v, &c))
+    {
         pause_enter();
         return;
     }
     print_quote("INVOICE PREVIEW", &q, v, c);
-    if (!confirm("\n  Confirm sale (Y/N)? ")) {
+    if (!confirm("\n  Confirm sale (Y/N)? "))
+    {
         printf("\n  Sale cancelled.\n");
         pause_enter();
         return;
@@ -493,7 +535,8 @@ static void sell_vehicle(void)
 
         now = time(NULL);
         strftime(datebuf, sizeof datebuf, "%Y-%m-%d", localtime(&now));
-        if (complete_sale(v, c, &q, datebuf) != 0) {
+        if (complete_sale(v, c, &q, datebuf) != 0)
+        {
             printf("\n  Could not complete sale.\n");
             pause_enter();
             return;
@@ -511,14 +554,12 @@ static void sell_vehicle(void)
 
 static void list_invoices(void)
 {
-    int i;
-    CUSTOMER *c;
-
     header("Invoices");
     printf("  %-6s %-10s %-6s %-26s %12s\n", "NO", "DATE", "VEH", "CUSTOMER", "TOTAL");
     printf("  ----------------------------------------------------------------\n");
-    for (i = 0; i < ninv; i++) {
-        c = find_cust(inv[i].cust_id);
+    for (int i = 0; i < ninv; i++)
+    {
+        CUSTOMER* c = find_cust(inv[i].cust_id);
         printf("  %-6d %-10s %-6d %-26.26s %12.2f\n",
                inv[i].no, inv[i].date, inv[i].veh_id,
                c ? c->name : "(unknown)", inv[i].total);
@@ -529,23 +570,25 @@ static void list_invoices(void)
 
 static void view_invoice(void)
 {
-    int no, i;
-    INVOICE *p = NULL;
-    VEHICLE *v;
-    CUSTOMER *c;
+    INVOICE* p = NULL;
 
     header("View Invoice");
-    no = read_int("  Invoice no : ");
-    for (i = 0; i < ninv; i++)
+    const int no = read_int("  Invoice no : ");
+    
+    for (int i = 0; i < ninv; i++)
         if (inv[i].no == no)
             p = &inv[i];
-    if (!p) {
+    
+    if (!p)
+    {
         printf("\n  Invoice not found.\n");
         pause_enter();
         return;
     }
-    v = find_veh(p->veh_id);
-    c = find_cust(p->cust_id);
+    
+    VEHICLE* v = find_veh(p->veh_id);
+    CUSTOMER* c = find_cust(p->cust_id);
+    
     printf("\n  INVOICE %d    Date: %s\n", p->no, p->date);
     printf("  ----------------------------------------------\n");
     printf("  Customer : %s\n", c ? c->name : "(unknown)");
@@ -556,26 +599,32 @@ static void view_invoice(void)
     printf("  Net price                %12.2f\n", p->net);
     printf("  Fees                     %12.2f\n", p->fees);
     printf("  VAT                      %12.2f\n", p->vat);
+    
     if (p->tradein != 0)
         printf("  Trade-in                 %12.2f\n", -p->tradein);
+    
     printf("  ==============================================\n");
     printf("  TOTAL                    %12.2f\n", p->total);
+    
     pause_enter();
 }
 
 static void invoice_menu(void)
 {
-    int opt;
-
-    for (;;) {
+    for (;;)
+    {
         header("Invoices");
         printf("  1. List invoices\n");
         printf("  2. View invoice\n");
         printf("  0. Back\n\n");
-        opt = read_int("  Option: ");
-        switch (opt) {
-        case 1: list_invoices(); break;
-        case 2: view_invoice(); break;
+        const int opt = read_int("  Option: ");
+        
+        switch (opt)
+        {
+        case 1: list_invoices();
+            break;
+        case 2: view_invoice();
+            break;
         case 0: return;
         default:
             printf("  Invalid option\n");
@@ -603,11 +652,10 @@ static void help_screen(void)
 
 int main(void)
 {
-    int opt;
-
     load_all();
 
-    for (;;) {
+    for (;;)
+    {
         header("Main Menu");
         printf("  1. Stock\n");
         printf("  2. Customers\n");
@@ -616,14 +664,21 @@ int main(void)
         printf("  5. Invoices\n");
         printf("  9. Help\n");
         printf("  0. Exit\n\n");
-        opt = read_int("  Option: ");
-        switch (opt) {
-        case 1: stock_menu(); break;
-        case 2: customer_menu(); break;
-        case 3: quote_screen(); break;
-        case 4: sell_vehicle(); break;
-        case 5: invoice_menu(); break;
-        case 9: help_screen(); break;
+        const int opt = read_int("  Option: ");
+        switch (opt)
+        {
+        case 1: stock_menu();
+            break;
+        case 2: customer_menu();
+            break;
+        case 3: quote_screen();
+            break;
+        case 4: sell_vehicle();
+            break;
+        case 5: invoice_menu();
+            break;
+        case 9: help_screen();
+            break;
         case 0:
             printf("\n  Goodbye.\n");
             return 0;

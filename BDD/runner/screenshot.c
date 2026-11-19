@@ -126,9 +126,8 @@ typedef struct {
 
 static void screen_clear(TermScreen *s)
 {
-    int r, c;
-    for (r = 0; r < TERM_ROWS; r++)
-        for (c = 0; c < TERM_COLS; c++)
+    for (int r = 0; r < TERM_ROWS; r++)
+        for (int c = 0; c < TERM_COLS; c++)
             s->cells[r][c] = ' ';
     s->row = 0;
     s->col = 0;
@@ -210,8 +209,7 @@ static void screen_feed(TermScreen *s, const char *text)
                 if (s->col >= TERM_COLS)
                     s->col = TERM_COLS - 1;
             } else if (*q == 'K') {
-                int c;
-                for (c = s->col; c < TERM_COLS; c++)
+                for (int c = s->col; c < TERM_COLS; c++)
                     s->cells[s->row][c] = ' ';
             }
             p = *q ? q + 1 : q;
@@ -223,9 +221,9 @@ static void screen_feed(TermScreen *s, const char *text)
 
 static int used_rows(const TermScreen *s)
 {
-    int r, c, last = 0;
-    for (r = 0; r < TERM_ROWS; r++) {
-        for (c = 0; c < TERM_COLS; c++) {
+    int last = 0;
+    for (int r = 0; r < TERM_ROWS; r++) {
+        for (int c = 0; c < TERM_COLS; c++) {
             if (s->cells[r][c] != ' ') {
                 last = r;
                 break;
@@ -235,11 +233,11 @@ static int used_rows(const TermScreen *s)
     return last + 1;
 }
 
-static int used_cols(const TermScreen *s, int rows)
+static int used_cols(const TermScreen *s, const int rows)
 {
-    int r, c, maxc = 40;
-    for (r = 0; r < rows; r++) {
-        for (c = TERM_COLS - 1; c >= 0; c--) {
+    int maxc = 40;
+    for (int r = 0; r < rows; r++) {
+        for (int c = TERM_COLS - 1; c >= 0; c--) {
             if (s->cells[r][c] != ' ') {
                 if (c + 1 > maxc)
                     maxc = c + 1;
@@ -252,22 +250,21 @@ static int used_cols(const TermScreen *s, int rows)
     return maxc;
 }
 
-static void blit_glyph(unsigned char *img, int img_w, int x, int y, char ch,
-                       unsigned char fr, unsigned char fg, unsigned char fb)
+static void blit_glyph(unsigned char *img, const int img_w, const int x, const int y, char ch,
+                       const unsigned char fr, const unsigned char fg, const unsigned char fb)
 {
-    int gi, row, col, sy, sx;
     if (ch < 32 || ch > 126)
         ch = '?';
-    gi = ch - 32;
-    for (row = 0; row < GLYPH_H; row++) {
-        unsigned char bits = FONT8X16[gi][row];
-        for (col = 0; col < GLYPH_W; col++) {
+    const int gi = ch - 32;
+    for (int row = 0; row < GLYPH_H; row++) {
+        const unsigned char bits = FONT8X16[gi][row];
+        for (int col = 0; col < GLYPH_W; col++) {
             if (bits & (0x80 >> col)) {
-                for (sy = 0; sy < SCALE; sy++) {
-                    for (sx = 0; sx < SCALE; sx++) {
-                        int px = x + col * SCALE + sx;
-                        int py = y + row * SCALE + sy;
-                        int off = (py * img_w + px) * 3;
+                for (int sy = 0; sy < SCALE; sy++) {
+                    for (int sx = 0; sx < SCALE; sx++) {
+                        const int px = x + col * SCALE + sx;
+                        const int py = y + row * SCALE + sy;
+                        const int off = (py * img_w + px) * 3;
                         img[off] = fr;
                         img[off + 1] = fg;
                         img[off + 2] = fb;
@@ -283,23 +280,20 @@ static int crc_ready;
 
 static void crc_init(void)
 {
-    unsigned long c;
-    int n, k;
     if (crc_ready)
         return;
-    for (n = 0; n < 256; n++) {
-        c = (unsigned long)n;
-        for (k = 0; k < 8; k++)
+    for (int n = 0; n < 256; n++) {
+        unsigned long c = (unsigned long)n;
+        for (int k = 0; k < 8; k++)
             c = (c & 1) ? (0xedb88320UL ^ (c >> 1)) : (c >> 1);
         crc_table[n] = c;
     }
     crc_ready = 1;
 }
 
-static int write_chunk(FILE *fp, const char *type, const unsigned char *data, size_t len)
+static int write_chunk(FILE *fp, const char *type, const unsigned char *data, const size_t len)
 {
     unsigned char lenb[4], crcbuf[4], typed[4];
-    unsigned long crc;
     size_t i;
 
     lenb[0] = (unsigned char)((len >> 24) & 0xff);
@@ -312,7 +306,7 @@ static int write_chunk(FILE *fp, const char *type, const unsigned char *data, si
     if (len && data && fwrite(data, 1, len, fp) != len)
         return -1;
     crc_init();
-    crc = 0xffffffffUL;
+    unsigned long crc = 0xffffffffUL;
     for (i = 0; i < 4; i++)
         crc = crc_table[(crc ^ typed[i]) & 0xff] ^ (crc >> 8);
     for (i = 0; i < len; i++)
@@ -328,12 +322,11 @@ static int write_chunk(FILE *fp, const char *type, const unsigned char *data, si
 static unsigned long screen_hash(const TermScreen *s)
 {
     unsigned long h = 2166136261UL;
-    int r, c;
-    int rows = used_rows(s);
-    int cols = used_cols(s, rows);
+    const int rows = used_rows(s);
+    const int cols = used_cols(s, rows);
 
-    for (r = 0; r < rows; r++) {
-        for (c = 0; c < cols; c++) {
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
             h ^= (unsigned char)s->cells[r][c];
             h *= 16777619UL;
         }
@@ -343,7 +336,7 @@ static unsigned long screen_hash(const TermScreen *s)
     return h;
 }
 
-static int screenshot_write_from_screen(TermScreen *screen, const char *path)
+static int screenshot_write_from_screen(const TermScreen *screen, const char *path)
 {
     int r;
     unsigned char *zbuf = NULL;
@@ -463,13 +456,12 @@ int screenshot_write_png_unique(const char *text, const char *path,
                                 unsigned long *last_hash)
 {
     TermScreen screen;
-    unsigned long h;
 
     if (!text || !path || !last_hash)
         return -1;
     screen_clear(&screen);
     screen_feed(&screen, text);
-    h = screen_hash(&screen);
+    const unsigned long h = screen_hash(&screen);
     if (*last_hash != 0 && h == *last_hash)
         return 1;
     if (screenshot_write_from_screen(&screen, path) != 0)

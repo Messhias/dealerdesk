@@ -170,7 +170,7 @@ int steps_next_id_value(const StepWorld *world, const char *key, int *out)
     if (!out || !key)
         return -1;
     snprintf(prefix, sizeof prefix, "%s=", key);
-    size_t n = strlen(prefix);
+    const size_t n = strlen(prefix);
     if (steps_data_path(world, "next_ids.dat", path, sizeof path) != 0)
         return -1;
     FILE* fp = fopen(path, "r");
@@ -760,7 +760,7 @@ int steps_stock_status_for_id(const StepWorld *world, const int id, const int wa
             fclose(fp);
             return -1;
         }
-        int st = atoi(p + 1);
+        const int st = atoi(p + 1);
         fclose(fp);
         if (st != want_status) {
             fprintf(stderr, "vehicle %d status %d want %d: %s", id, st, want_status,

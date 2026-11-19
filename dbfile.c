@@ -12,7 +12,7 @@
 
 #define DATA_DIR "data/"
 
-static void cpy(char *d, const char *s, int n)
+static void cpy(char *d, const char *s, const int n)
 {
     strncpy(d, s ? s : "", n - 1);
     d[n - 1] = 0;
@@ -20,40 +20,58 @@ static void cpy(char *d, const char *s, int n)
 
 static void load_stock(void)
 {
-    FILE *f;
     char line[512];
-    char *t;
-    VEHICLE *v;
 
     nveh = 0;
-    f = fopen(DATA_DIR "stock.dat", "r");
+    FILE* f = fopen(DATA_DIR "stock.dat", "r");
     if (!f)
         return;
     while (fgets(line, sizeof line, f) && nveh < MAX_VEH) {
         line[strcspn(line, "\r\n")] = 0;
+        
         if (line[0] == 0 || line[0] == '#')
             continue;
-        v = &veh[nveh];
-        t = strtok(line, "|");
+        
+        VEHICLE* v = &veh[nveh];
+        
+        char* t = strtok(line, "|");
+        
         if (!t)
             continue;
+        
         v->id = atoi(t);
         t = strtok(NULL, "|");
+        
         cpy(v->plate, t, sizeof v->plate);
+        
         t = strtok(NULL, "|");
+        
         cpy(v->make, t, sizeof v->make);
+        
         t = strtok(NULL, "|");
+        
         cpy(v->model, t, sizeof v->model);
+        
         t = strtok(NULL, "|");
+        
         v->year = t ? atoi(t) : 0;
+        
         t = strtok(NULL, "|");
+        
         v->mileage = t ? atol(t) : 0;
+        
         t = strtok(NULL, "|");
+        
         v->cost = t ? atof(t) : 0;
+        
         t = strtok(NULL, "|");
+        
         v->price = t ? atof(t) : 0;
+        
         t = strtok(NULL, "|");
+        
         v->status = t ? atoi(t) : 0;
+        
         nveh++;
     }
     fclose(f);
@@ -61,21 +79,18 @@ static void load_stock(void)
 
 static void load_customers(void)
 {
-    FILE *f;
     char line[512];
-    char *t;
-    CUSTOMER *c;
 
     ncust = 0;
-    f = fopen(DATA_DIR "customers.dat", "r");
+    FILE* f = fopen(DATA_DIR "customers.dat", "r");
     if (!f)
         return;
     while (fgets(line, sizeof line, f) && ncust < MAX_CUST) {
         line[strcspn(line, "\r\n")] = 0;
         if (line[0] == 0 || line[0] == '#')
             continue;
-        c = &cust[ncust];
-        t = strtok(line, "|");
+        CUSTOMER* c = &cust[ncust];
+        char* t = strtok(line, "|");
         if (!t)
             continue;
         c->id = atoi(t);
@@ -94,21 +109,18 @@ static void load_customers(void)
 
 static void load_invoices(void)
 {
-    FILE *f;
     char line[512];
-    char *t;
-    INVOICE *i;
 
     ninv = 0;
-    f = fopen(DATA_DIR "invoices.dat", "r");
+    FILE* f = fopen(DATA_DIR "invoices.dat", "r");
     if (!f)
         return;
     while (fgets(line, sizeof line, f) && ninv < MAX_INV) {
         line[strcspn(line, "\r\n")] = 0;
         if (line[0] == 0 || line[0] == '#')
             continue;
-        i = &inv[ninv];
-        t = strtok(line, "|");
+        INVOICE* i = &inv[ninv];
+        char* t = strtok(line, "|");
         if (!t)
             continue;
         i->no = atoi(t);
@@ -139,10 +151,9 @@ static void load_invoices(void)
 
 static void load_ids(void)
 {
-    FILE *f;
     char line[128];
 
-    f = fopen(DATA_DIR "next_ids.dat", "r");
+    FILE* f = fopen(DATA_DIR "next_ids.dat", "r");
     if (!f)
         return;
     while (fgets(line, sizeof line, f)) {
@@ -163,15 +174,12 @@ void load_all(void)
 
 void save_stock(void)
 {
-    FILE *f;
-    int i;
-
-    f = fopen(DATA_DIR "stock.dat", "w");
+    FILE* f = fopen(DATA_DIR "stock.dat", "w");
     if (!f) {
         printf("  ERROR: cannot write stock.dat\n");
         return;
     }
-    for (i = 0; i < nveh; i++)
+    for (int i = 0; i < nveh; i++)
         fprintf(f, "%d|%s|%s|%s|%d|%ld|%.2f|%.2f|%d\n",
                 veh[i].id, veh[i].plate, veh[i].make, veh[i].model,
                 veh[i].year, veh[i].mileage, veh[i].cost, veh[i].price,
@@ -181,15 +189,12 @@ void save_stock(void)
 
 void save_customers(void)
 {
-    FILE *f;
-    int i;
-
-    f = fopen(DATA_DIR "customers.dat", "w");
+    FILE* f = fopen(DATA_DIR "customers.dat", "w");
     if (!f) {
         printf("  ERROR: cannot write customers.dat\n");
         return;
     }
-    for (i = 0; i < ncust; i++)
+    for (int i = 0; i < ncust; i++)
         fprintf(f, "%d|%s|%s|%s|%c\n",
                 cust[i].id, cust[i].name, cust[i].phone, cust[i].email,
                 cust[i].type);
@@ -198,15 +203,12 @@ void save_customers(void)
 
 void save_invoices(void)
 {
-    FILE *f;
-    int i;
-
-    f = fopen(DATA_DIR "invoices.dat", "w");
+    FILE* f = fopen(DATA_DIR "invoices.dat", "w");
     if (!f) {
         printf("  ERROR: cannot write invoices.dat\n");
         return;
     }
-    for (i = 0; i < ninv; i++)
+    for (int i = 0; i < ninv; i++)
         fprintf(f, "%d|%s|%d|%d|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f|%.2f\n",
                 inv[i].no, inv[i].date, inv[i].veh_id, inv[i].cust_id,
                 inv[i].list, inv[i].disc, inv[i].net, inv[i].vat,
@@ -216,9 +218,7 @@ void save_invoices(void)
 
 void save_ids(void)
 {
-    FILE *f;
-
-    f = fopen(DATA_DIR "next_ids.dat", "w");
+    FILE* f = fopen(DATA_DIR "next_ids.dat", "w");
     if (!f) {
         printf("  ERROR: cannot write next_ids.dat\n");
         return;

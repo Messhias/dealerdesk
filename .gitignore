@@ -3,3 +3,5 @@
 /BDD/runner/bdd_runner
 /BDD/runner/bdd_runner.linux
 .idea/
+*.DotSettings.user
+CMakeLists.txt.DotSettings.user

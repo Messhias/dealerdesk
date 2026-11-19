@@ -3,7 +3,8 @@ if(POLICY CMP0110)
     cmake_policy(SET CMP0110 NEW)
 endif()
 
-set(TEST_COMMON test_common.c)
+# Include test_common.h on every test target so IDEs do not mark it orphan.
+set(TEST_COMMON test_common.c test_common.h)
 
 add_executable(test_pricing
     test_pricing.c

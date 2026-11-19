@@ -34,10 +34,10 @@ static int match_pattern(const char *pattern, const char *text, char *arg, const
         return strcmp(pattern, text) == 0;
     }
     {
-        size_t prefix = (size_t)(ph - pattern);
+        const size_t prefix = (size_t)(ph - pattern);
         const char *suffix = ph + strlen("{string}");
-        size_t suffix_len = strlen(suffix);
-        size_t text_len = strlen(text);
+        const size_t suffix_len = strlen(suffix);
+        const size_t text_len = strlen(text);
         if (strncmp(pattern, text, prefix) != 0)
             return 0;
         if (text_len < prefix + suffix_len)

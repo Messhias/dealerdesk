@@ -144,7 +144,7 @@ static const scenario_entry SCENARIOS[] = {
     {"mark_existing_fleet", scenario_mark_existing_fleet},
 };
 
-int main(int argc, char **argv)
+int main(const int argc, char **argv)
 {
     size_t i;
     int failed = 0;

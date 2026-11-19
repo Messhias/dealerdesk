@@ -24,7 +24,7 @@ int      next_veh_id;
 int      next_cust_id;
 int      next_inv_no;
 
-static void seed_one_customer(int id, const char *name, char type)
+static void seed_one_customer(const int id, const char *name, const char type)
 {
     ncust = 1;
     cust[0].id = id;

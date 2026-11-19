@@ -151,7 +151,7 @@ static const scenario_entry SCENARIOS[] = {
     {"rnd2", scenario_rnd2_unit},
 };
 
-int main(int argc, char **argv)
+int main(const int argc, char **argv)
 {
     size_t i;
     int failed = 0;
