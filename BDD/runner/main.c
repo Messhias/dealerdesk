@@ -31,7 +31,7 @@ static void trim(char *s)
         *--e = 0;
 }
 
-static void slugify(const char *in, char *out, size_t outlen)
+static void slugify(const char *in, char *out, const size_t outlen)
 {
     size_t i = 0;
     
@@ -46,7 +46,7 @@ static void slugify(const char *in, char *out, size_t outlen)
         return;
 
     for (; *in && i + 1 < outlen; in++) {
-        unsigned char c = (unsigned char)*in;
+        const unsigned char c = (unsigned char)*in;
         if (isalnum(c)) {
             out[i++] = (char)tolower(c);
             prev_us = 0;
@@ -170,7 +170,7 @@ static int line_is_tag_terminal(const char *line)
 
 static int starts_with_kw(const char *line, const char *kw, const char **rest)
 {
-    size_t n = strlen(kw);
+    const size_t n = strlen(kw);
     if (strncmp(line, kw, n) != 0)
         return 0;
     if (line[n] != ' ' && line[n] != '\t')
@@ -181,7 +181,7 @@ static int starts_with_kw(const char *line, const char *kw, const char **rest)
     return 1;
 }
 
-static void feature_stem_from_path(const char *path, char *stem, size_t stemlen)
+static void feature_stem_from_path(const char *path, char *stem, const size_t stemlen)
 {
     const char* slash = strrchr(path, '/');
     const char* base = slash ? slash + 1 : path;
@@ -321,18 +321,17 @@ static int run_feature_file(const char *path)
 
 static int ends_with(const char *name, const char *suf)
 {
-    size_t n = strlen(name);
-    size_t s = strlen(suf);
+    const size_t n = strlen(name);
+    const size_t s = strlen(suf);
     if (n < s)
         return 0;
     return strcmp(name + n - s, suf) == 0;
 }
 
-int main(int argc, char **argv)
+int main(const int argc, char **argv)
 {
     /* g_repo_root[1024] + "/BDD/features". */
     char features_dir[1200];
-    DIR *dir;
     struct dirent *ent;
     int failures = 0;
     int files = 0;
@@ -348,7 +347,7 @@ int main(int argc, char **argv)
     steps_register_all();
     snprintf(features_dir, sizeof features_dir, "%s/BDD/features", g_repo_root);
 
-    dir = opendir(features_dir);
+    DIR* dir = opendir(features_dir);
     if (!dir) {
         perror(features_dir);
         return 2;

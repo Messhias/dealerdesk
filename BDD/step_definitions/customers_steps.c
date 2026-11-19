@@ -124,7 +124,7 @@ static int add_customer_flow(const StepWorld *world, const char *name, const cha
     if (steps_enter_customers_menu(world) != 0)
         return -1;
 
-    size_t mark = world->console->out_len;
+    const size_t mark = world->console->out_len;
     if (console_sendline(world->console, "2") != 0)
         return -1;
 
@@ -234,7 +234,7 @@ static int step_add_succeeds(const StepWorld *world, const char *arg)
 static int step_customers_remain_empty(const StepWorld *world, const char *arg)
 {
     (void)arg;
-    int n = steps_count_data_rows(world, "customers.dat");
+    const int n = steps_count_data_rows(world, "customers.dat");
     if (n != 0) {
         fprintf(stderr, "customer rows %d want 0\n", n);
         return -1;
@@ -246,8 +246,8 @@ static int step_exactly_n_customers(const StepWorld *world, const char *arg)
 {
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
-    int got = steps_count_data_rows(world, "customers.dat");
+    const int want = atoi(arg);
+    const int got = steps_count_data_rows(world, "customers.dat");
     if (got != want) {
         fprintf(stderr, "customer rows %d want %d\n", got, want);
         return -1;
@@ -261,7 +261,7 @@ static int step_customer_id_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_customer_field(world, want, "id", idbuf, sizeof idbuf) != 0) {
         fprintf(stderr, "customer id %d missing\n", want);
         return -1;
@@ -304,7 +304,7 @@ static int step_next_customer_id_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_next_id_value(world, "customer", &got) != 0)
         return -1;
     if (got != want) {
@@ -330,7 +330,7 @@ static int find_by_name_flow(const StepWorld *world, const char *needle)
     if (steps_enter_customers_menu(world) != 0)
         return -1;
 
-    size_t mark = world->console->out_len;
+    const size_t mark = world->console->out_len;
     if (console_sendline(world->console, "3") != 0)
         return -1;
     if (console_expect(world->console, "Name contains", 3000) != 0)
@@ -376,7 +376,7 @@ static int step_match_count(const StepWorld *world, const char *arg)
     (void)world;
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_fixture()->last_match_count != want) {
         fprintf(stderr, "match count %d want %d\n",
                 steps_fixture()->last_match_count, want);

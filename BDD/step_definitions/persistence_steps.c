@@ -248,7 +248,7 @@ static int step_next_veh_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_next_id_value(world, "vehicle", &got) != 0)
         return -1;
     if (got != want) {
@@ -264,7 +264,7 @@ static int step_next_cust_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_next_id_value(world, "customer", &got) != 0)
         return -1;
     if (got != want) {
@@ -290,7 +290,7 @@ static int step_next_inv_remains(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_next_id_value(world, "invoice", &got) != 0)
         return -1;
     if (got != want) {
@@ -306,7 +306,7 @@ static int step_exactly_n_vehicles(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     int got = steps_count_data_rows(world, "stock.dat");
     if (got < 0)
         got = 0;
@@ -318,7 +318,7 @@ static int step_exactly_n_vehicles(const StepWorld *world, const char *arg)
         return -1;
     if (steps_enter_stock_menu(world) != 0)
         return -1;
-    size_t mark = world->console->out_len;
+    const size_t mark = world->console->out_len;
     if (console_sendline(world->console, "1") != 0)
         return -1;
     if (console_expect(world->console, "Press ENTER to continue", 5000) != 0)
@@ -337,7 +337,7 @@ static int step_exactly_n_customers(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     int got = steps_count_data_rows(world, "customers.dat");
     if (got < 0)
         got = 0;
@@ -348,7 +348,7 @@ static int step_exactly_n_customers(const StepWorld *world, const char *arg)
         return -1;
     if (steps_enter_customers_menu(world) != 0)
         return -1;
-    size_t mark = world->console->out_len;
+    const size_t mark = world->console->out_len;
     if (console_sendline(world->console, "1") != 0)
         return -1;
     if (console_expect(world->console, "Press ENTER to continue", 5000) != 0)
@@ -367,7 +367,7 @@ static int step_vehicle_id_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_vehicle_field(world, want, "id", idbuf, sizeof idbuf) != 0) {
         fprintf(stderr, "vehicle id %d not found\n", want);
         return -1;
@@ -382,7 +382,7 @@ static int step_customer_id_is(const StepWorld *world, const char *arg)
 
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
+    const int want = atoi(arg);
     if (steps_customer_field(world, want, "id", idbuf, sizeof idbuf) != 0) {
         fprintf(stderr, "customer id %d not found\n", want);
         return -1;

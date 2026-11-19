@@ -13,16 +13,20 @@ int vehicle_can_quote(const VEHICLE *v)
 {
     if (!v)
         return 0;
+    
     return v->status != ST_SOLD;
 }
 
-void invoice_from_quote(INVOICE *i, const QUOTE *q, int inv_no,
-                        const char *date, int veh_id, int cust_id)
+void invoice_from_quote(INVOICE *i, const QUOTE *q, const int inv_no,
+                        const char *date, const int veh_id, const int cust_id)
 {
     memset(i, 0, sizeof *i);
+    
     i->no = inv_no;
+    
     if (date)
         snprintf(i->date, sizeof i->date, "%s", date);
+    
     i->veh_id = veh_id;
     i->cust_id = cust_id;
     i->list = q->list;
@@ -39,15 +43,21 @@ int complete_sale(VEHICLE *v, const CUSTOMER *c, const QUOTE *q,
 {
     if (!v || !c || !q || !date)
         return -1;
+    
     if (!vehicle_can_quote(v))
         return -1;
+    
     if (ninv >= MAX_INV)
         return -1;
 
     INVOICE* i = &inv[ninv];
+    
     invoice_from_quote(i, q, next_inv_no, date, v->id, c->id);
+    
     next_inv_no++;
     ninv++;
+    
     v->status = ST_SOLD;
+    
     return 0;
 }

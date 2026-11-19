@@ -24,7 +24,7 @@ int      next_veh_id;
 int      next_cust_id;
 int      next_inv_no;
 
-static void seed_one_vehicle(int id, const char *plate, double price, int status)
+static void seed_one_vehicle(const int id, const char *plate, const double price, const int status)
 {
     nveh = 1;
     veh[0].id = id;

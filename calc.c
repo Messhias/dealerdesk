@@ -15,7 +15,7 @@
 #include <math.h>
 #include "calc.h"
 
-double rnd2(double x)
+double rnd2(const double x)
 {
     return floor(x * 100.0 + 0.5) / 100.0;
 }

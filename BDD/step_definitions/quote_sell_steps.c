@@ -102,8 +102,8 @@ static int step_exactly_n_invoices(const StepWorld *world, const char *arg)
 {
     if (!arg || !arg[0])
         return -1;
-    int want = atoi(arg);
-    int got = steps_count_invoice_rows(world);
+    const int want = atoi(arg);
+    const int got = steps_count_invoice_rows(world);
     if (got < 0)
         return -1;
     if (got != want) {
@@ -183,7 +183,7 @@ static int step_quote_eligibility(const StepWorld *world, const char *arg)
         return -1;
 
     snprintf(veh, sizeof veh, "%d", steps_fixture()->veh_id);
-    size_t mark = world->console->out_len;
+    const size_t mark = world->console->out_len;
     if (console_sendline(world->console, "3") != 0)
         return -1;
     if (console_expect(world->console, "Vehicle ID", 3000) != 0)
